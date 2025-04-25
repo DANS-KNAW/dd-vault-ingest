@@ -133,7 +133,8 @@
 
         <dependency>
             <groupId>nl.knaw.dans</groupId>
-            <artifactId>bagit</artifactId>
+            <artifactId>dans-bagit-lib</artifactId>
+            <version>1.2.0</version>
         </dependency>
 
         <dependency>

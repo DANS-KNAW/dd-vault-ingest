@@ -24,6 +24,7 @@ import nl.knaw.dans.validatedansbag.invoker.ApiException;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -32,7 +33,7 @@ public abstract class AbstractBagValidator implements BagValidator {
     private final DefaultApi api;
 
     @Override
-    public void validate(Path bagDir) throws InvalidDepositException, IOException {
+    public void validate(UUID depositId, Path bagDir) throws InvalidDepositException, IOException {
         if (bagDir == null) {
             throw new InvalidDepositException("Bag directory cannot be null");
         }
@@ -42,12 +43,12 @@ public abstract class AbstractBagValidator implements BagValidator {
             .packageType(getPackageType());
 
         try {
-            log.debug("Validating bag {} with command {}", bagDir, command);
+            log.debug("[{}] Validating bag {} with command {}", depositId, bagDir, command);
             var result = api.validateLocalDirPost(command);
             if (Boolean.FALSE.equals(result.getIsCompliant())) {
                 throw formatValidationError(result);
             }
-            log.debug("Bag is compliant:");
+            log.debug("[{}] Bag is compliant", depositId);
         }
         catch (ApiException e) {
             throw new RuntimeException("Could not validate bag", e);

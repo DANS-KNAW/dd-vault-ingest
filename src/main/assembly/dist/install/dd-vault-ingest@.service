@@ -7,6 +7,7 @@ ExecStart=/opt/dans.knaw.nl/dd-vault-ingest/bin/dd-vault-ingest server /etc/opt/
 SuccessExitStatus=143
 Environment="JAVA_OPTS=-Xms64m"
 Environment="LC_ALL=en_US.UTF-8"
+SyslogIdentifier=dd-vault-ingest@%i
 
 User=dd-vault-ingest
 Group=dd-vault-ingest

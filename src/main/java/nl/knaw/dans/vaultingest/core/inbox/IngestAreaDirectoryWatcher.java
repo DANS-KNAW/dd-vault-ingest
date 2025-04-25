@@ -100,7 +100,7 @@ public class IngestAreaDirectoryWatcher implements IngestAreaWatcher, Managed {
 
         @Override
         public void onDirectoryCreate(File directory) {
-            log.trace("Directory created: {}", directory);
+            log.debug("Directory created: {}", directory);
             callback.onItemCreated(directory.toPath().toAbsolutePath());
         }
     }

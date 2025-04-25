@@ -15,8 +15,8 @@
  */
 package nl.knaw.dans.vaultingest.core.deposit;
 
-import gov.loc.repository.bagit.domain.Bag;
-import gov.loc.repository.bagit.reader.BagReader;
+import nl.knaw.dans.bagit.domain.Bag;
+import nl.knaw.dans.bagit.reader.BagReader;
 import nl.knaw.dans.vaultingest.core.xml.XmlReader;
 import org.junit.jupiter.api.Test;
 

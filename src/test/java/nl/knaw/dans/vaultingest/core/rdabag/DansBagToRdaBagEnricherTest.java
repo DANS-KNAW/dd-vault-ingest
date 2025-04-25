@@ -16,9 +16,9 @@
 package nl.knaw.dans.vaultingest.core.rdabag;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.loc.repository.bagit.domain.Bag;
-import gov.loc.repository.bagit.reader.BagReader;
-import gov.loc.repository.bagit.verify.BagVerifier;
+import nl.knaw.dans.bagit.domain.Bag;
+import nl.knaw.dans.bagit.reader.BagReader;
+import nl.knaw.dans.bagit.verify.BagVerifier;
 import nl.knaw.dans.vaultingest.AbstractTestWithTestDir;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteConverter;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteSerializer;
@@ -78,8 +78,8 @@ class DansBagToRdaBagEnricherTest extends AbstractTestWithTestDir {
             return true;
         }
         catch (Exception e) {
-            // if the exception class is in the gov.loc.repository.bagit.exceptions package, then the bag is invalid
-            if (e.getClass().getPackageName().equals("gov.loc.repository.bagit.exceptions")) {
+            // if the exception class is in the nl.knaw.dans.bagit.exceptions package, then the bag is invalid
+            if (e.getClass().getPackageName().equals("nl.knaw.dans.bagit.exceptions")) {
                 return false;
             }
             throw e;

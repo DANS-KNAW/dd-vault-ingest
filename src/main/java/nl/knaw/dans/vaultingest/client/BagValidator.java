@@ -17,7 +17,8 @@ package nl.knaw.dans.vaultingest.client;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.UUID;
 
 public interface BagValidator {
-    void validate(Path depositDir) throws InvalidDepositException, IOException;
+    void validate(UUID depositId, Path bagDir) throws InvalidDepositException, IOException;
 }

@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.vaultingest.core.deposit;
 
-import gov.loc.repository.bagit.hash.SupportedAlgorithm;
+import nl.knaw.dans.bagit.hash.SupportedAlgorithm;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

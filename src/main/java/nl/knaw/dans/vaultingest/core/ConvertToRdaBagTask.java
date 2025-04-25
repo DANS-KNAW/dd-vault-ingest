@@ -36,6 +36,7 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -63,30 +64,40 @@ public class ConvertToRdaBagTask implements Runnable {
 
     private Deposit deposit;
 
+    private UUID depositId;
+
     public void run() {
-        log.info("Processing deposit on path {}", path);
         try {
+            log.info("[{}] START processing deposit", getDepositId(path));
             var bagDir = getBagDir(path);
 
-            log.debug("Validating deposit on path {}", bagDir);
-            bagValidator.validate(bagDir);
+            bagValidator.validate(getDepositId(path), bagDir);
 
-            log.debug("Loading deposit on path {}", path);
+            log.debug("[{}] Loading deposit info", getDepositId(path));
             deposit = depositManager.loadDeposit(path, dataSupplierMap);
             processDeposit();
 
-            log.debug("Deposit {} processed successfully", deposit.getId());
             depositManager.saveDepositProperties(deposit);
-
-            log.debug("Moving deposit to outbox");
+            log.debug("[{}] Saved deposit properties", getDepositId(path));
             outbox.moveDeposit(deposit);
+            log.info("[{}] Moved deposit to outbox", getDepositId(path));
         }
         catch (InvalidDepositException e) {
+            log.warn("[{}] REJECTED deposit: {}", getDepositId(path), e.getMessage());
             handleFailedDeposit(path, outbox, Deposit.State.REJECTED, e);
         }
         catch (Throwable e) {
+            log.error("[{}] FAILED deposit: {}", getDepositId(path), e.getMessage());
             handleFailedDeposit(path, outbox, Deposit.State.FAILED, e);
         }
+        log.info("[{}] END processing deposit", getDepositId(path));
+    }
+
+    private UUID getDepositId(Path path) {
+        if (depositId == null) {
+            depositId = UUID.fromString(path.getFileName().toString());
+        }
+        return depositId;
     }
 
     private void processDeposit() throws InvalidDepositException, IOException {
@@ -96,6 +107,7 @@ public class ConvertToRdaBagTask implements Runnable {
 
     private void createSkeletonRecordInVaultCatalog() throws IOException, InvalidDepositException {
         if (deposit.isUpdate()) {
+            log.debug("[{}] Deposit is an update", deposit.getId());
             var dataset = vaultCatalogClient.findDataset(convertToSwordToken(deposit.getIsVersionOf()))
                 .orElseThrow(() -> new InvalidDepositException(String.format("Dataset with sword token %s not found in vault catalog", deposit.getSwordToken())));
             checkDataSupplier(dataset);
@@ -152,7 +164,6 @@ public class ConvertToRdaBagTask implements Runnable {
         return numbers.size() + 1;
     }
 
-
     private void convertToRdaBag() throws IOException {
         try {
             rdaBagWriterFactory.createRdaBagWriter(deposit).write(dveOutbox.resolve(outputFilename(deposit.getBagId(), deposit.getObjectVersion())));
@@ -174,22 +185,19 @@ public class ConvertToRdaBagTask implements Runnable {
     }
 
     private void handleFailedDeposit(Path path, Outbox outbox, Deposit.State state, Throwable error) {
-        log.error("Deposit on path {} failed with state {}", path, state, error);
-
         try {
             depositManager.updateDepositState(path, state, error.getMessage());
-            log.info("Moving deposit {} to outbox: {}", path, state);
+            log.info("[{}] Moving deposit {} to outbox: {}", getDepositId(path), path, state);
             outbox.move(path, state);
         }
         catch (Throwable e) {
-            log.error("Failed to update deposit state and move deposit to outbox", e);
+            log.error("[{}] Failed to update deposit state and move deposit to outbox", getDepositId(path), e);
 
             try {
-                log.info("Just moving deposit {} to outbox: {}", path, Deposit.State.FAILED);
                 outbox.move(path, Deposit.State.FAILED);
             }
             catch (IOException ioException) {
-                log.error("Failed to move deposit to outbox, nothing left to do", ioException);
+                log.error("[{}] Failed to move deposit to outbox, leaving it in the inbox.", getDepositId(path), ioException);
             }
         }
     }

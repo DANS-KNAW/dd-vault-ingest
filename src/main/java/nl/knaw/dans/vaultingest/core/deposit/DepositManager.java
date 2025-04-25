@@ -15,9 +15,9 @@
  */
 package nl.knaw.dans.vaultingest.core.deposit;
 
-import gov.loc.repository.bagit.domain.Bag;
-import gov.loc.repository.bagit.hash.SupportedAlgorithm;
-import gov.loc.repository.bagit.reader.BagReader;
+import nl.knaw.dans.bagit.domain.Bag;
+import nl.knaw.dans.bagit.hash.SupportedAlgorithm;
+import nl.knaw.dans.bagit.reader.BagReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.vaultingest.core.xml.XPathEvaluator;
@@ -47,29 +47,31 @@ public class DepositManager {
     private final XmlReader xmlReader;
 
     public Deposit loadDeposit(Path path, Map<String, String> dataSupplierMap) {
+        var depositId = path.getFileName().toString();
+
         try {
             var bagDir = getBagDir(path);
 
-            log.info("Reading bag from path {}", bagDir);
+            log.debug("[{}] Reading bag from path {}", depositId, bagDir);
             var bag = new BagReader().read(bagDir);
 
-            log.info("Reading metadata/dataset.xml from path {}", bagDir);
+            log.debug("[{}] Reading metadata/dataset.xml", depositId);
             var ddm = readXmlFile(bagDir.resolve(Path.of("metadata", "dataset.xml")));
 
-            log.info("Reading metadata/files.xml from path {}", bagDir);
+            log.debug("[{}] Reading metadata/files.xml", depositId);
             var filesXml = readXmlFile(bagDir.resolve(Path.of("metadata", "files.xml")));
 
-            log.info("Generating original file paths if file exists");
+            log.debug("[{}] Generating original file paths if file exists", depositId);
             var originalFilePaths = getOriginalFilepaths(bagDir);
 
-            log.info("Reading deposit.properties on path {}", path);
+            log.debug("[{}] Reading deposit.properties", depositId);
             var depositProperties = getDepositProperties(path);
 
-            log.info("Generating payload file list on path {}", path);
+            log.debug("[{}] Generating payload file list", depositId);
             var payloadFiles = getPayloadFiles(bagDir, bag, ddm, filesXml, originalFilePaths);
 
             final String depositorId = depositProperties.getDepositorId();
-            log.info("Looking up dataSupplier for depositorId {}", depositorId);
+            log.debug("[{}] Looking up dataSupplier for depositorId {}", depositId, depositorId);
             if (!dataSupplierMap.containsKey(depositorId))
                 throw new Exception(String.format("No mapping to Data Supplier found for user id '%s'.", depositorId));
             var dataSupplier = dataSupplierMap.get(depositorId);
@@ -88,7 +90,7 @@ public class DepositManager {
             return customizeDeposit(deposit, depositProperties);
         }
         catch (Exception e) {
-            log.error("Error loading deposit from disk: path={}", path, e);
+            log.error("[{}] Error loading deposit from disk: path={}", depositId, path, e);
             throw new RuntimeException(e);
         }
     }
