@@ -78,8 +78,9 @@ public class ConvertToRdaBagTask implements Runnable {
             processDeposit();
 
             depositManager.saveDepositProperties(deposit);
-
+            log.debug("[{}] Saved deposit properties", getDepositId(path));
             outbox.moveDeposit(deposit);
+            log.info("[{}] Moved deposit to outbox", getDepositId(path));
         }
         catch (InvalidDepositException e) {
             log.warn("[{}] REJECTED deposit: {}", getDepositId(path), e.getMessage());

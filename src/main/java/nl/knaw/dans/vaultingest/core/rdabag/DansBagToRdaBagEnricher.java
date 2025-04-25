@@ -74,19 +74,19 @@ public class DansBagToRdaBagEnricher {
     public void write(Path rdaBag) throws IOException {
         this.tagManifestAlgorithms = deposit.getBag().getTagManifestAlgorithms();
 
-        log.debug("Adding metadata/datacite.xml");
+        log.debug("[{}] Adding metadata/datacite.xml", deposit.getId());
         var resource = dataciteConverter.convert(deposit);
         var dataciteXml = dataciteSerializer.serialize(resource);
         checksummedWriteToOutput(Path.of("metadata/datacite.xml"), dataciteXml);
 
-        log.debug("Adding metadata/oai-ore[.rdf|.jsonld]");
+        log.debug("[{}] Adding metadata/oai-ore[.rdf|.jsonld]", deposit.getId());
         var oaiOre = oaiOreConverter.convert(deposit);
         var rdf = oaiOreSerializer.serializeAsRdf(oaiOre);
         var jsonld = oaiOreSerializer.serializeAsJsonLd(oaiOre);
         checksummedWriteToOutput(Path.of("metadata/oai-ore.rdf"), rdf);
         checksummedWriteToOutput(Path.of("metadata/oai-ore.jsonld"), jsonld);
 
-        log.debug("Adding metadata/pid-mapping.txt");
+        log.debug("[{}] Adding metadata/pid-mapping.txt", deposit.getId());
         var pidMappings = pidMappingConverter.convert(deposit);
         var pidMappingsSerialized = pidMappingSerializer.serialize(pidMappings);
         checksummedWriteToOutput(Path.of("metadata/pid-mapping.txt"), pidMappingsSerialized);
@@ -94,12 +94,14 @@ public class DansBagToRdaBagEnricher {
         // bag-info.txt does not need changing, as no payload files are added or removed
 
         // must be last, because all other files must have been written
-        log.debug("Modifying tagmanifest-*.txt files");
+        log.debug("[{}] Modifying tagmanifest-*.txt files", deposit.getId());
         modifyTagManifests(); // Add checksums for new metadata files
 
-        log.debug("Creating ZIP file");
+        log.debug("[{}] Creating ZIP file", deposit.getId());
         var tempZipFile = rdaBag.resolveSibling(rdaBag.getFileName() + ".tmp");
+        log.debug("[{}] Zipping directory {} to {}", deposit.getId(), deposit.getBagDir(), tempZipFile);
         ZipUtil.zipDirectory(deposit.getBagDir(), tempZipFile, true);
+        log.debug("[{}] Moving {} to {}", deposit.getId(), tempZipFile, rdaBag);
         Files.move(tempZipFile, rdaBag);
     }
 
@@ -126,7 +128,7 @@ public class DansBagToRdaBagEnricher {
             try (var outputStream = FileUtils.openOutputStream(deposit.getBagDir().resolve(path).toFile())) {
                 IOUtils.copy(input, outputStream);
                 var result = input.getChecksums();
-                log.debug("Checksums for {}: {}", path, result);
+                log.debug("[{}] Checksums for {}: {}", deposit.getId(), path, result);
                 changedChecksums.put(path, result);
             }
         }

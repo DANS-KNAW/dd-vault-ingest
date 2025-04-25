@@ -58,7 +58,7 @@ public class DepositManager {
             log.debug("[{}] Reading metadata/dataset.xml", depositId);
             var ddm = readXmlFile(bagDir.resolve(Path.of("metadata", "dataset.xml")));
 
-            log.debug("[{}] Reading metadata/files.xml", bagDir);
+            log.debug("[{}] Reading metadata/files.xml", depositId);
             var filesXml = readXmlFile(bagDir.resolve(Path.of("metadata", "files.xml")));
 
             log.debug("[{}] Generating original file paths if file exists", depositId);
