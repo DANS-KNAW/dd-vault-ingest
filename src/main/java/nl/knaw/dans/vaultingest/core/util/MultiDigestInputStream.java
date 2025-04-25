@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.vaultingest.core.util;
 
-import gov.loc.repository.bagit.hash.SupportedAlgorithm;
+import nl.knaw.dans.bagit.hash.SupportedAlgorithm;
 
 import java.io.IOException;
 import java.io.InputStream;

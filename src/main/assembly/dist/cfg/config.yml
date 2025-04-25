@@ -71,8 +71,13 @@ logging:
       archive: false
       timeZone: system
       currentLogFilename: /var/opt/dans.knaw.nl/log/dd-vault-ingest/dd-vault-ingest.log
+      logFormat: "%-5p [%d{ISO8601}] %c{0}: %m%n%dwREx"
+    # Used in combination with journald, which already adds the timestamp
+    - type: console
+      logFormat: "%-5p %c{0}: %m%n%dwREx"
   loggers:
     'org.hibernate.engine.internal.StatisticalLoggingSessionEventListener': 'OFF'
+    'nl.knaw.dans.bagit': 'WARN'
 
 validateDansBag:
   validateUrl: 'http://localhost:20330'

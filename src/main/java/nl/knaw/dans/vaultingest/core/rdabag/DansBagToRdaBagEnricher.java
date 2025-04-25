@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.vaultingest.core.rdabag;
 
-import gov.loc.repository.bagit.hash.SupportedAlgorithm;
+import nl.knaw.dans.bagit.hash.SupportedAlgorithm;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

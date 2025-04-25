@@ -15,10 +15,10 @@
  */
 package nl.knaw.dans.vaultingest.core.deposit;
 
-import gov.loc.repository.bagit.domain.Bag;
-import gov.loc.repository.bagit.domain.Manifest;
-import gov.loc.repository.bagit.hash.SupportedAlgorithm;
-import gov.loc.repository.bagit.writer.ManifestWriter;
+import nl.knaw.dans.bagit.domain.Bag;
+import nl.knaw.dans.bagit.domain.Manifest;
+import nl.knaw.dans.bagit.hash.SupportedAlgorithm;
+import nl.knaw.dans.bagit.writer.ManifestWriter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
