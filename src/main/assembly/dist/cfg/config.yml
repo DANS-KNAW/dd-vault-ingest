@@ -10,6 +10,13 @@ server:
   adminConnectors:
     - type: http
       port: 20361
+  requestLog:
+    appenders:
+      - type: file
+        archive: false
+        timeZone: system
+        currentLogFilename: /var/opt/dans.knaw.nl/log/dd-vault-ingest/request.log
+        logFormat: "%-5p [%d{ISO8601}] %c{0}: %m%n%dwREx"
 
 health:
   delayedShutdownHandlerEnabled: false
@@ -24,7 +31,7 @@ health:
 ingestFlow:
   rdaBagOutputDir: /var/opt/dans.knaw.nl/tmp/dve-outbox
   autoIngest:
-    dataSuppliers: {}
+    dataSuppliers: { }
     # todo: how to check if an update is authorized?
     inbox: /var/opt/dans.knaw.nl/tmp/auto-ingest/inbox
     outbox: /var/opt/dans.knaw.nl/tmp/auto-ingest/outbox
@@ -48,8 +55,7 @@ ingestFlow:
     keepAliveTime: 60 seconds
 
 vaultCatalog:
-#  url: https://vault.dans.knaw.nl/catalog
-  url:  https://dev.transfer.dans-data.nl
+  url: https://dev.transfer.dans-data.nl
   httpClient:
     userAgent: dd-vault-ingest
     connectionTimeout: 1min
