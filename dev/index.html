@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Development - dd-vault-ingest</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Development";
+        var mkdocs_page_input_path = "dev.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> dd-vault-ingest
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Manual</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Development</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#set-up">Set-up</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#initialize-development-environment">Initialize development environment</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#start-services">Start services</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#create-a-deposit">Create a deposit</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#start-an-ingest">Start an ingest</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#test-after-deploy">Test after deploy</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../arch/">⇒ DANS Data Station Architecture</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">dd-vault-ingest</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li><li>Development</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/DANS-KNAW/dd-vault-ingest/edit/master/docs/dev.md"> Edit on DANS-KNAW/dd-vault-ingest</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="development">Development<a class="headerlink" href="#development" title="Permanent link">&para;</a></h1>
+<p>This page contains information for developers about how to contribute to this project.</p>
+<h2 id="set-up">Set-up<a class="headerlink" href="#set-up" title="Permanent link">&para;</a></h2>
+<p>This project can be used in combination with  <a href="https://github.com/DANS-KNAW/dans-dev-tools#readme" target="_blank">dans-dev-tools</a>. 
+Before you can start it as a service some dependencies must first be started.
+One dependency is <a href="https://github.com/DANS-KNAW/dd-validate-dans-bag#readme" target="_blank">dd-validate-dans-bag</a>.
+For the other dependency you have the choice between a local service <a href="https://github.com/DANS-KNAW/dd-vault-catalog#readme" target="_blank">dd-vault-catalog</a> and a Virtual Machine (VM) <code>dev_transfer</code>.
+The local variant requires a local database. 
+For the VM you need access to the project <a href="https://github.com/DANS-KNAW/dd-dtap#readme" target="_blank">dd-dtap</a>,</p>
+<h3 id="initialize-development-environment">Initialize development environment<a class="headerlink" href="#initialize-development-environment" title="Permanent link">&para;</a></h3>
+<p>This is only necessary once per project. If you execute this any existing configuration and data will be reset.</p>
+<p>Open separate terminal tabs for <code>dd-vault-ingest</code>, its dependency <code>dd-validate-dans-bag</code>
+and the optional dependency (when not using the VM <code>dev_transfer</code>) <code>dd-vault-catalog</code>. In each tab run:</p>
+<pre><code class="language-commandline">start-env.sh
+</code></pre>
+<p>The service <code>dd-validate-dans-bag</code> needs different configurations for <code>dd-vault-ingest</code> and other services. 
+So you will have to update the generated <code>dd-validate-dans-bag/etc/config.yml</code>,
+perhaps keep copies of the files or comment lines to switch between both situations.</p>
+<ul>
+<li><code>dataverse: null</code></li>
+<li><code>vaultCatalog.baseUrl: https://dev.transfer.dans-data.nl/vault-catalog</code></li>
+</ul>
+<p>You will also have to adjust <code>dd-vault-ingest/etc/config.yml</code>:</p>
+<ul>
+<li>vaultCatalog.url: https://dev.transfer.dans-data.nl</li>
+</ul>
+<p>Both URLs in the above configuration examples assume you use the VM <code>dev_transfer</code>, 
+if not, keep the URLs as generated from <code>src/test/resources/debug-etc</code>.</p>
+<h3 id="start-services">Start services<a class="headerlink" href="#start-services" title="Permanent link">&para;</a></h3>
+<p>To start the VM, run in the root of <code>dd-dtap</code>:</p>
+<pre><code class="language-commandline">start-preprovisioned-box.py -s dev_transfer
+</code></pre>
+<p>Without the VM you will need a local database for the service <code>dd-vault-catalog</code>, run in a separate terminal tab:</p>
+<pre><code class="language-commandline">start-hsqldb-server.sh
+</code></pre>
+<p>Pick the appropriate <code>vaultCatalog.url</code> in <code>dd-vault-ingest/etc/config.yml</code>.
+Open terminal tabs for the services <code>dd-vault-ingest</code>, <code>dd-validate-dans-bag</code>, optionally (when not using the VM <code>dev_transfer</code>) <code>dd-vault-catalog</code> and run in each:</p>
+<pre><code class="language-commandline">start-service.sh
+</code></pre>
+<h3 id="create-a-deposit">Create a deposit<a class="headerlink" href="#create-a-deposit" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Create a directory <code>/vagrant/shared/&lt;UUID&gt;</code>, this location makes it available on VMs at <code>/vagrant/shared</code>.</li>
+<li>Copy a valid bag into that directory, for example:<pre class="codehilite"><code>dd-dans-sword2-examples/src/main/resources/example-bags/valid/default-open
+</code></pre>
+
+</li>
+</ul>
+<p>Note that <code>all_mappings</code> has an invalid prefix for <code>Has-Organizational-Identifier</code> in <code>bag-info.txt</code>.</p>
+<ul>
+<li>
+<p>Create a file in the same directory named <code>deposit.properties</code>, an example for the content:</p>
+<pre class="codehilite"><code>bag-store.bag-id = &lt;UUID&gt;
+dataverse.bag-id = urn:uuid:&lt;UUID&gt;
+dataverse.sword-token = sword:&lt;UUID&gt;
+creation.timestamp = 2023-08-16T17:40:41.390209+02:00
+deposit.origin = SWORD2
+depositor.userId = user001
+bag-store.bag-name = default-open
+</code></pre>
+
+<p>Note that 
+* The <code>bag-name</code> should match the copied bag.
+* The <code>userId</code> should match a value configured as a <code>dataSupplier</code> in <code>dd-vault-ingest/etc/config.yml</code>.
+* The <code>&lt;UUID&gt;</code> should match the directory name.
+* To test updates you will need different UUIDs for each <code>example-bags/valid/*</code> and move them to the inbox.
+  Note that the <code>revision02</code> and <code>revision03</code> bags lack an <code>Is-Version-Of: &lt;UUID&gt;</code> in <code>bag-info.txt</code>,
+  it must be a valid SWORD token in the vault catalog.
+  Adding this property requires an update of the <code>tagmanifest-sha1.txt</code>.
+  A validation error message will show the proper value, for example (with a locally running validator):</p>
+<p>cd dd-dans-sword2-examples
+  ./run-validation.sh http://localhost:20330/validate /vagrant/shared/<UUID>/<bag-name></p>
+</li>
+</ul>
+<h2 id="start-an-ingest">Start an ingest<a class="headerlink" href="#start-an-ingest" title="Permanent link">&para;</a></h2>
+<p>To start an ingest locally, move (not copy, otherwise the processing might start before the copy completed)
+a deposit into one of the inboxes configured in:</p>
+<pre class="codehilite"><code>dd-vault-ingest/etc/config.yml
+</code></pre>
+
+<p>You can examine details of the result on <code>dev_transfer</code> in <code>/var/opt/dans.knaw.nl/tmp/ocfl-tar/inbox</code>
+and the database: </p>
+<pre class="codehilite"><code>sudo su postgres
+psql dd_vault_catalog
+select bag_id, data_supplier from ocfl_object_versions;
+\c dd_transfer_to_vault
+select bag_id, data_supplier from transfer_item;
+</code></pre>
+
+<p>Or examine the local transfer results in <code>dd-vault-ingest/data/rda-bags</code>
+and with <code>start-hsqldb-client.sh</code> executed in <code>dd-vault-catalog</code>.
+The start dialog needs <code>database.url</code> specified in <code>dd-vault-catalog/etc/config.yml</code>.</p>
+<h3 id="test-after-deploy">Test after deploy<a class="headerlink" href="#test-after-deploy" title="Permanent link">&para;</a></h3>
+<p>The catalog results can be found on the VM <code>dev_transfer</code>,
+the service under test (<code>dd-vault-ingest</code>) should be deployed on <code>dev_vaas</code>, both VMs should be running.</p>
+<p>Make the deposits available that were prepared in <code>/vagrant/shared</code>:</p>
+<pre class="codehilite"><code>cd /var/opt/dans.knaw.nl/tmp/auto-ingest # configured in /etc/opt/dans.knaw.nl/dd-vault-ingest/config.ym
+cp -r `readlink -m /vagrant/shared/*/revision*/..` .. # or the actually wrapped bag(s)
+chmod -R 777 ../*7*
+</code></pre>
+
+<p>Start an ingest:</p>
+<pre class="codehilite"><code>mv -v `readlink -m ../*/revision01/..` inbox
+</code></pre>
+
+<p>Or see <a href="https://dans-knaw.github.io/dd-dans-sword2-examples/#testing-different-scenarios" target="_blank">dd-dans-sword2-examples</a> with IRI <code>https://dev.sword2.vaas.datastations.nl/collection/1</code></p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Manual"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../arch/" class="btn btn-neutral float-right" title="⇒ DANS Data Station Architecture">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../arch/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
