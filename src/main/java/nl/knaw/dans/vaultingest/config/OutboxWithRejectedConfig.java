@@ -13,8 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.vaultingest.core.inbox;
+package nl.knaw.dans.vaultingest.config;
 
-public interface IngestAreaWatcher {
-    void start(IngestAreaItemCreated callback);
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import javax.validation.constraints.NotNull;
+import java.nio.file.Path;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class OutboxWithRejectedConfig extends OutboxConfig {
+    @NotNull
+    private Path rejected;
 }

@@ -16,28 +16,31 @@
 package nl.knaw.dans.vaultingest.core;
 
 import lombok.AllArgsConstructor;
+import nl.knaw.dans.lib.util.inbox.InboxTaskFactory;
 import nl.knaw.dans.vaultingest.client.BagValidator;
 import nl.knaw.dans.vaultingest.client.VaultCatalogClient;
+import nl.knaw.dans.vaultingest.core.bagpack.BagPackWriterFactory;
 import nl.knaw.dans.vaultingest.core.deposit.DepositManager;
-import nl.knaw.dans.vaultingest.core.deposit.Outbox;
-import nl.knaw.dans.vaultingest.core.rdabag.DefaultRdaBagWriterFactory;
 import nl.knaw.dans.vaultingest.core.util.IdMinter;
 
 import java.nio.file.Path;
-import java.util.Map;
 
 @AllArgsConstructor
-public class ConvertToRdaBagTaskFactory {
-    private final String storageRoot;
-    private final Map<String, String> dataSupplierMap;
-    private final DefaultRdaBagWriterFactory rdaBagWriterFactory;
+public class WriteBagPackTaskFactory implements InboxTaskFactory {
+    private final String ocflStorageRoot;
+    private final String dataSupplier;
+    private final Path outboxProcessed;
+    private final Path outboxFailed;
+    private final Path outboxRejected;
+    private final BagPackWriterFactory rdaBagWriterFactory;
     private final VaultCatalogClient vaultCatalogClient;
     private final BagValidator bagValidator;
     private final IdMinter idMinter;
     private final DepositManager depositManager;
     private final Path dveOutbox;
 
-    public ConvertToRdaBagTask create(Path path, Outbox outbox) {
-        return new ConvertToRdaBagTask(path, outbox, storageRoot, dataSupplierMap, rdaBagWriterFactory, vaultCatalogClient, bagValidator, idMinter, depositManager, dveOutbox);
+    public Runnable createInboxTask(Path path) {
+        return new WriteBagPackTask(path,
+            outboxProcessed, outboxFailed, outboxRejected, ocflStorageRoot, dataSupplier, rdaBagWriterFactory, vaultCatalogClient, bagValidator, idMinter, depositManager, dveOutbox);
     }
 }

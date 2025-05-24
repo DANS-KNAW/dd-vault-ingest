@@ -22,20 +22,17 @@ health:
       schedule:
         checkInterval: 60s
 
-ingestFlow:
-  storageRoot: testroot
-  rdaBagOutputDir: data/rda-bag
-  autoIngest:
-    dataSuppliers:
-      user001: The Organization Name
-    # todo: how to check if an update is authorized?
-    inbox: data/inbox
-    outbox: data/outbox
-  migration:
-    dataSuppliers:
-      user001: The Organization Name
-    inbox: data/migration-inbox
-    outbox: data/migration-outbox
+vaultIngest:
+  ocflStorageRoot: testroot
+  bagPackOutputDir: data/bag-pack-outbox
+  dataSupplier: The Organization Name
+  inbox:
+    path: data/inbox
+    pollingInterval: 500ms
+  outbox:
+    processed: data/outbox/processed
+    failed: data/outbox/failed
+    rejected: data/outbox/rejected
   languages:
     iso6391: etc/iso639-1-to-dv.csv
     iso6392: etc/iso639-2-to-dv.csv

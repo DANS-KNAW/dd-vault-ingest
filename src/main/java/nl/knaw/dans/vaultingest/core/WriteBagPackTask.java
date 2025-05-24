@@ -25,8 +25,7 @@ import nl.knaw.dans.vaultingest.client.InvalidDepositException;
 import nl.knaw.dans.vaultingest.client.VaultCatalogClient;
 import nl.knaw.dans.vaultingest.core.deposit.Deposit;
 import nl.knaw.dans.vaultingest.core.deposit.DepositManager;
-import nl.knaw.dans.vaultingest.core.deposit.Outbox;
-import nl.knaw.dans.vaultingest.core.rdabag.DefaultRdaBagWriterFactory;
+import nl.knaw.dans.vaultingest.core.bagpack.BagPackWriterFactory;
 import nl.knaw.dans.vaultingest.core.util.IdMinter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,25 +33,30 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ConvertToRdaBagTask implements Runnable {
+public class WriteBagPackTask implements Runnable {
     @NonNull
-    private final Path path;
+    private final Path depositDir;
 
     @NonNull
-    private final Outbox outbox;
+    private final Path outboxProcessed;
+
+    @NonNull
+    private final Path outboxFailed;
+
+    @NonNull
+    private final Path outboxRejected;
 
     @NonNull
     private final String storageRoot;
     @NonNull
-    private final Map<String, String> dataSupplierMap;
+    private final String dataSupplier;
     @NonNull
-    private final DefaultRdaBagWriterFactory rdaBagWriterFactory;
+    private final BagPackWriterFactory rdaBagWriterFactory;
     @NonNull
     private final VaultCatalogClient vaultCatalogClient;
     @NonNull
@@ -70,29 +74,42 @@ public class ConvertToRdaBagTask implements Runnable {
 
     public void run() {
         try {
-            log.info("[{}] START processing deposit", getDepositId(path));
-            var bagDir = getBagDir(path);
+            log.info("[{}] START processing deposit", getDepositId(depositDir));
+            var bagDir = getBagDir(depositDir);
 
-            bagValidator.validate(getDepositId(path), bagDir);
+            bagValidator.validate(getDepositId(depositDir), bagDir);
 
-            log.debug("[{}] Loading deposit info", getDepositId(path));
-            deposit = depositManager.loadDeposit(path, dataSupplierMap);
+            log.debug("[{}] Loading deposit info", getDepositId(depositDir));
+            deposit = depositManager.loadDeposit(depositDir, dataSupplier);
             processDeposit();
 
             depositManager.saveDepositProperties(deposit);
-            log.debug("[{}] Saved deposit properties", getDepositId(path));
-            outbox.moveDeposit(deposit);
-            log.info("[{}] Moved deposit to outbox", getDepositId(path));
+            log.debug("[{}] Saved deposit properties", getDepositId(depositDir));
+            depositManager.updateDepositState(depositDir, Deposit.State.ACCEPTED, "Deposit accepted");
+            Files.move(depositDir, outboxProcessed.resolve(depositDir.getFileName()));
+            log.info("[{}] Moved deposit to outbox", getDepositId(depositDir));
         }
         catch (InvalidDepositException e) {
-            log.warn("[{}] REJECTED deposit: {}", getDepositId(path), e.getMessage());
-            handleFailedDeposit(path, outbox, Deposit.State.REJECTED, e);
+            log.warn("[{}] REJECTED deposit: {}", getDepositId(depositDir), e.getMessage());
+            try {
+                depositManager.updateDepositState(depositDir, Deposit.State.REJECTED, e.getMessage());
+                Files.move(depositDir, outboxRejected.resolve(depositDir.getFileName()));
+            }
+            catch (IOException ioException) {
+                log.error("[{}] Failed to move deposit to outbox-rejected", getDepositId(depositDir), ioException);
+            }
         }
-        catch (Throwable e) {
-            log.error("[{}] FAILED deposit: {}", getDepositId(path), e.getMessage());
-            handleFailedDeposit(path, outbox, Deposit.State.FAILED, e);
+        catch (Exception e) {
+            log.error("[{}] FAILED deposit: {}", getDepositId(depositDir), e.getMessage(), e);
+            try {
+                depositManager.updateDepositState(depositDir, Deposit.State.FAILED, e.getMessage());
+                Files.move(depositDir, outboxFailed.resolve(depositDir.getFileName()));
+            }
+            catch (IOException ioException) {
+                log.error("[{}] Failed to handle failed deposit", getDepositId(depositDir), ioException);
+            }
         }
-        log.info("[{}] END processing deposit", getDepositId(path));
+        log.info("[{}] END processing deposit", getDepositId(depositDir));
     }
 
     private UUID getDepositId(Path path) {
@@ -104,7 +121,7 @@ public class ConvertToRdaBagTask implements Runnable {
 
     private void processDeposit() throws InvalidDepositException, IOException {
         createSkeletonRecordInVaultCatalog();
-        convertToRdaBag();
+        convertToBagPack();
     }
 
     private void createSkeletonRecordInVaultCatalog() throws IOException, InvalidDepositException {
@@ -166,9 +183,9 @@ public class ConvertToRdaBagTask implements Runnable {
         return numbers.size() + 1;
     }
 
-    private void convertToRdaBag() throws IOException {
+    private void convertToBagPack() throws IOException {
         try {
-            rdaBagWriterFactory.createRdaBagWriter(deposit).write(dveOutbox.resolve(outputFilename(deposit.getBagId(), deposit.getObjectVersion())));
+            rdaBagWriterFactory.createBagPackWriter(deposit).writeTo(dveOutbox.resolve(outputFilename(deposit.getBagId(), deposit.getObjectVersion())));
             deposit.setState(Deposit.State.ACCEPTED, "Deposit accepted");
         }
         catch (Exception e) {
@@ -184,24 +201,6 @@ public class ConvertToRdaBagTask implements Runnable {
         bagId = bagId.toLowerCase().replaceAll(".*:", "");
 
         return String.format("vaas-%s-v%s.zip", bagId, objectVersion);
-    }
-
-    private void handleFailedDeposit(Path path, Outbox outbox, Deposit.State state, Throwable error) {
-        try {
-            depositManager.updateDepositState(path, state, error.getMessage());
-            log.info("[{}] Moving deposit {} to outbox: {}", getDepositId(path), path, state);
-            outbox.move(path, state);
-        }
-        catch (Throwable e) {
-            log.error("[{}] Failed to update deposit state and move deposit to outbox", getDepositId(path), e);
-
-            try {
-                outbox.move(path, Deposit.State.FAILED);
-            }
-            catch (IOException ioException) {
-                log.error("[{}] Failed to move deposit to outbox, leaving it in the inbox.", getDepositId(path), ioException);
-            }
-        }
     }
 
     private Path getBagDir(Path path) throws InvalidDepositException {

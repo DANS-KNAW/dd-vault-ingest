@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.vaultingest.core.rdabag;
+package nl.knaw.dans.vaultingest.core.bagpack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.knaw.dans.bagit.domain.Bag;
@@ -38,19 +38,19 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DansBagToRdaBagEnricherTest extends AbstractTestWithTestDir {
+class BagPackWriterTest extends AbstractTestWithTestDir {
 
     @Test
-    public void write_should_keep_bag_valid() throws Exception {
+    public void write_To_should_keep_bag_valid() throws Exception {
         var manager = new DepositManager(new XmlReader());
         var inputDeposit = Path.of("src/test/resources/input/c169676f-5315-4d86-bde0-a62dbc915228");
         var testDeposit = testDir.resolve(inputDeposit.getFileName());
         FileUtils.copyDirectory(inputDeposit.toFile(), testDeposit.toFile());
-        var deposit = manager.loadDeposit(testDeposit, Map.of("user001", "Name of user"));
+        var deposit = manager.loadDeposit(testDeposit, "Name of user");
         assertThat(isBagValid(deposit.getBagDir())).isTrue(); // Valid before enriching
-        var rdaBag = testDir.resolve("rda-bag.zip");
+        var bagPack = testDir.resolve("rda-bag.zip");
 
-        var enricher = new DansBagToRdaBagEnricher(
+        var bagPackWriter = new BagPackWriter(
             deposit,
             new DataciteSerializer(),
             new PidMappingSerializer(),
@@ -60,7 +60,7 @@ class DansBagToRdaBagEnricherTest extends AbstractTestWithTestDir {
             new OaiOreConverter(TestLanguageResolverSingleton.getInstance(), TestCountryResolverSingleton.getInstance())
         );
 
-        enricher.write(rdaBag);
+        bagPackWriter.writeTo(bagPack);
         // check that the following files are present in the bag
         assertThat(deposit.getBagDir().resolve("metadata/datacite.xml")).exists();
         assertThat(deposit.getBagDir().resolve("metadata/pid-mapping.txt")).exists();

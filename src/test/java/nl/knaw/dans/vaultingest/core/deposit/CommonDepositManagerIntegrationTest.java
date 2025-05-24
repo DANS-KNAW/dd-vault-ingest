@@ -36,19 +36,8 @@ class CommonDepositManagerIntegrationTest {
         var s = getClass().getResource("/input/0b9bb5ee-3187-4387-bb39-2c09536c79f7");
         assert s != null;
 
-        var deposit = manager.loadDeposit(Path.of(s.getPath()), Map.of("user001","Name of user"));
+        var deposit = manager.loadDeposit(Path.of(s.getPath()), "Name of user");
         assertThat(deposit.getId()).isEqualTo("0b9bb5ee-3187-4387-bb39-2c09536c79f7");
-    }
-
-    @Test
-    void loadDeposit_should_complain_about_missing_data_supplier() {
-        var manager = new DepositManager(new XmlReader());
-
-        var s = getClass().getResource("/input/0b9bb5ee-3187-4387-bb39-2c09536c79f7");
-        assertNotNull(s);
-
-        assertThatThrownBy(() ->  manager.loadDeposit(Path.of(s.getPath()), Map.of()))
-            .hasMessage("java.lang.Exception: No mapping to Data Supplier found for user id 'user001'.");
     }
 
     @Test
@@ -62,7 +51,7 @@ class CommonDepositManagerIntegrationTest {
         // first verify there is actually an original-filepaths.txt file
         assertThat(Files.exists(path.resolve("audiences/original-filepaths.txt"))).isTrue();
 
-        var deposit = manager.loadDeposit(path, Map.of("user001","Name of user"));
+        var deposit = manager.loadDeposit(path, "Name of user");
         var files = deposit.getPayloadFiles();
 
         // check that the file paths are the original ones, not the renamed ones

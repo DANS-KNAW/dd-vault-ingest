@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.vaultingest.core.rdabag;
+package nl.knaw.dans.vaultingest.core.bagpack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteConverter;
@@ -26,7 +26,7 @@ import nl.knaw.dans.vaultingest.core.oaiore.OaiOreSerializer;
 import nl.knaw.dans.vaultingest.core.pidmapping.PidMappingConverter;
 import nl.knaw.dans.vaultingest.core.pidmapping.PidMappingSerializer;
 
-public class DefaultRdaBagWriterFactory {
+public class BagPackWriterFactory {
 
     private final DataciteSerializer dataciteSerializer;
     private final PidMappingSerializer pidMappingSerializer;
@@ -36,7 +36,7 @@ public class DefaultRdaBagWriterFactory {
     private final PidMappingConverter pidMappingConverter;
     private final OaiOreConverter oaiOreConverter;
 
-    public DefaultRdaBagWriterFactory(ObjectMapper objectMapper, LanguageResolver languageResolver, CountryResolver countryResolver) {
+    public BagPackWriterFactory(ObjectMapper objectMapper, LanguageResolver languageResolver, CountryResolver countryResolver) {
         this.dataciteSerializer = new DataciteSerializer();
         this.pidMappingSerializer = new PidMappingSerializer();
         this.oaiOreSerializer = new OaiOreSerializer(objectMapper);
@@ -45,8 +45,8 @@ public class DefaultRdaBagWriterFactory {
         this.oaiOreConverter = new OaiOreConverter(languageResolver, countryResolver);
     }
 
-    public DansBagToRdaBagEnricher createRdaBagWriter(Deposit deposit) {
-        return new DansBagToRdaBagEnricher(
+    public BagPackWriter createBagPackWriter(Deposit deposit) {
+        return new BagPackWriter(
             deposit,
             dataciteSerializer,
             pidMappingSerializer,

@@ -15,18 +15,15 @@
  */
 package nl.knaw.dans.vaultingest.config;
 
-import lombok.Getter;
+import io.dropwizard.util.Duration;
+import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.nio.file.Path;
-import java.util.Map;
 
-@Getter
+@Data
 public class InboxConfig {
     @NotNull
-    private Path inbox;
-    @NotNull
-    private Path outbox;
-    @NotNull
-    private Map<String, String> dataSuppliers;
+    private Path path;
+    private Duration pollingInterval = Duration.seconds(5);
 }

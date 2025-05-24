@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.vaultingest.core.rdabag;
+package nl.knaw.dans.vaultingest.core.bagpack;
 
 import nl.knaw.dans.bagit.hash.SupportedAlgorithm;
 import lombok.NonNull;
@@ -42,11 +42,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Enriching a DANS Bag with metadata so that it becomes compliant with the RDA recommendations.
+ * Enriching a DANS Bag with metadata so that it becomes an RDA "BagPack".
  */
 @Slf4j
 @RequiredArgsConstructor
-public class DansBagToRdaBagEnricher {
+public class BagPackWriter {
     @NonNull
     private final Deposit deposit;
 
@@ -71,7 +71,7 @@ public class DansBagToRdaBagEnricher {
     private final Map<Path, Map<SupportedAlgorithm, String>> changedChecksums = new HashMap<>();
     private Set<SupportedAlgorithm> tagManifestAlgorithms;
 
-    public void write(Path rdaBag) throws IOException {
+    public void writeTo(Path bagPack) throws IOException {
         this.tagManifestAlgorithms = deposit.getBag().getTagManifestAlgorithms();
 
         log.debug("[{}] Adding metadata/datacite.xml", deposit.getId());
@@ -98,11 +98,11 @@ public class DansBagToRdaBagEnricher {
         modifyTagManifests(); // Add checksums for new metadata files
 
         log.debug("[{}] Creating ZIP file", deposit.getId());
-        var tempZipFile = rdaBag.resolveSibling(rdaBag.getFileName() + ".tmp");
+        var tempZipFile = bagPack.resolveSibling(bagPack.getFileName() + ".tmp");
         log.debug("[{}] Zipping directory {} to {}", deposit.getId(), deposit.getBagDir(), tempZipFile);
         ZipUtil.zipDirectory(deposit.getBagDir(), tempZipFile, true);
-        log.debug("[{}] Moving {} to {}", deposit.getId(), tempZipFile, rdaBag);
-        Files.move(tempZipFile, rdaBag);
+        log.debug("[{}] Moving {} to {}", deposit.getId(), tempZipFile, bagPack);
+        Files.move(tempZipFile, bagPack);
     }
 
     private void modifyTagManifests() throws IOException {

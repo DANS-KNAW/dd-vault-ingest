@@ -23,24 +23,33 @@ import javax.validation.constraints.NotNull;
 import java.nio.file.Path;
 
 @Getter
-public class IngestFlowConfig {
+public class VaultIngestConfig {
     @NotNull
-    private String storageRoot;
+    private String ocflStorageRoot;
+
+    @NotNull
+    private Path bagPackOutputDir;
+
+    @NotNull
+    private String dataSupplier;
+
     @NotNull
     @Valid
-    private InboxConfig autoIngest;
+    private InboxConfig inbox;
+
     @NotNull
     @Valid
-    private InboxConfig migration;
-    @NotNull
-    @Valid
-    private ExecutorServiceFactory taskQueue;
-    @NotNull
-    private Path rdaBagOutputDir;
+    private OutboxWithRejectedConfig outbox;
+
     @NotNull
     @Valid
     private LanguageConfig languages;
+
     @NotNull
     @Valid
     private Path spatialCoverageCountryTermsPath;
+
+    @NotNull
+    @Valid
+    private ExecutorServiceFactory taskQueue;
 }
