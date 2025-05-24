@@ -97,6 +97,7 @@ public class DdVaultIngestApplication extends Application<DdVaultIngestFlowConfi
         var idMinter = new IdMinter();
 
         var autoIngestConvertToRdaBagTaskFactory = new ConvertToRdaBagTaskFactory(
+            configuration.getIngestFlow().getStorageRoot(),
             configuration.getIngestFlow().getAutoIngest().getDataSuppliers(),
             rdaBagWriterFactory,
             vaultCatalogClient,
@@ -125,6 +126,7 @@ public class DdVaultIngestApplication extends Application<DdVaultIngestFlowConfi
         var migrationDepositManager = new MigrationDepositManager(xmlReader);
 
         var migrationIngestConvertToRdaBagTaskFactory = new ConvertToRdaBagTaskFactory(
+            configuration.getIngestFlow().getStorageRoot(),
             configuration.getIngestFlow().getMigration().getDataSuppliers(),
             rdaBagWriterFactory,
             vaultCatalogClient,

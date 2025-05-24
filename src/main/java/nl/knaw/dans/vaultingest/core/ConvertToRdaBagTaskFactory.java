@@ -28,6 +28,7 @@ import java.util.Map;
 
 @AllArgsConstructor
 public class ConvertToRdaBagTaskFactory {
+    private final String storageRoot;
     private final Map<String, String> dataSupplierMap;
     private final DefaultRdaBagWriterFactory rdaBagWriterFactory;
     private final VaultCatalogClient vaultCatalogClient;
@@ -37,6 +38,6 @@ public class ConvertToRdaBagTaskFactory {
     private final Path dveOutbox;
 
     public ConvertToRdaBagTask create(Path path, Outbox outbox) {
-        return new ConvertToRdaBagTask(path, outbox, dataSupplierMap, rdaBagWriterFactory, vaultCatalogClient, bagValidator, idMinter, depositManager, dveOutbox);
+        return new ConvertToRdaBagTask(path, outbox, storageRoot, dataSupplierMap, rdaBagWriterFactory, vaultCatalogClient, bagValidator, idMinter, depositManager, dveOutbox);
     }
 }

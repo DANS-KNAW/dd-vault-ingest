@@ -23,6 +23,7 @@ health:
         checkInterval: 60s
 
 ingestFlow:
+  storageRoot: testroot
   rdaBagOutputDir: data/rda-bag
   autoIngest:
     dataSuppliers:

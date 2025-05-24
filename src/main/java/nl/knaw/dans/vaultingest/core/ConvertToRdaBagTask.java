@@ -48,6 +48,8 @@ public class ConvertToRdaBagTask implements Runnable {
     private final Outbox outbox;
 
     @NonNull
+    private final String storageRoot;
+    @NonNull
     private final Map<String, String> dataSupplierMap;
     @NonNull
     private final DefaultRdaBagWriterFactory rdaBagWriterFactory;
@@ -118,7 +120,7 @@ public class ConvertToRdaBagTask implements Runnable {
         }
         else {
             deposit.setNbn(idMinter.mintUrnNbn());
-            vaultCatalogClient.createDatasetFor(deposit);
+            vaultCatalogClient.createDatasetFor(storageRoot, deposit);
         }
     }
 

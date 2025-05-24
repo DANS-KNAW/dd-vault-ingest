@@ -32,7 +32,7 @@ public class VaultCatalogClientImpl implements VaultCatalogClient {
     private final DefaultApi vaultCatalogApi;
 
     @Override
-    public DatasetDto createDatasetFor(Deposit deposit) throws IOException {
+    public DatasetDto createDatasetFor(String storageRoot, Deposit deposit) throws IOException {
         var versionExportDto = new VersionExportDto()
             .bagId(deposit.getBagId())
             .datasetNbn(deposit.getNbn())
@@ -42,7 +42,7 @@ public class VaultCatalogClientImpl implements VaultCatalogClient {
 
         var datasetDto = new DatasetDto()
             .nbn(deposit.getNbn())
-            .datastation("VaaS") // TODO: get from configuration or set in dd-transfer-to-vault (but in that case it must not be a required field)
+            .ocflStorageRoot(storageRoot)
             .swordToken(deposit.getSwordToken())
             .dataSupplier(deposit.getDataSupplier())
             .addVersionExportsItem(versionExportDto);

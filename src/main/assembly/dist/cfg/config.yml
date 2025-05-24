@@ -28,6 +28,7 @@ health:
         checkInterval: 60s
 
 ingestFlow:
+  storageRoot: changeme
   rdaBagOutputDir: /var/opt/dans.knaw.nl/tmp/dve-outbox
   autoIngest:
     dataSuppliers: { }

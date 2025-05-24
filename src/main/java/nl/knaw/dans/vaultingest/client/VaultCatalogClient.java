@@ -24,7 +24,7 @@ import java.util.Optional;
 
 public interface VaultCatalogClient {
 
-    DatasetDto createDatasetFor(Deposit deposit) throws IOException;
+    DatasetDto createDatasetFor(String storageroot, Deposit deposit) throws IOException;
 
     VersionExportDto addDatasetVersionFor(Deposit deposit) throws IOException;
 

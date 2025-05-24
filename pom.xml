@@ -35,6 +35,8 @@
     <properties>
         <main-class>nl.knaw.dans.vaultingest.DdVaultIngestApplication</main-class>
         <dd-validate-dans-bag-api.version>1.0.0</dd-validate-dans-bag-api.version>
+        <!-- TODO: move to parent pom -->
+        <dd-vault-catalog-api.version>0.9.0</dd-vault-catalog-api.version>
     </properties>
 
     <scm>

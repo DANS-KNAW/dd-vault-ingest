@@ -25,6 +25,8 @@ import java.nio.file.Path;
 @Getter
 public class IngestFlowConfig {
     @NotNull
+    private String storageRoot;
+    @NotNull
     @Valid
     private InboxConfig autoIngest;
     @NotNull
