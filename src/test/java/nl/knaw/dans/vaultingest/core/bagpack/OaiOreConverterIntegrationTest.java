@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.vaultingest.core.rdabag;
+package nl.knaw.dans.vaultingest.core.bagpack;
 
 import lombok.Builder;
 import lombok.Value;
@@ -637,7 +637,7 @@ public class OaiOreConverterIntegrationTest {
 
     private ModelObject loadModel() throws Exception {
         var depositManager = new TestDepositManager();
-        var deposit = depositManager.loadDeposit(Path.of("/input/integration-test-complete-bag/c169676f-5315-4d86-bde0-a62dbc915228/"), Map.of("user001","Name of user"));
+        var deposit = depositManager.loadDeposit(Path.of("/input/integration-test-complete-bag/c169676f-5315-4d86-bde0-a62dbc915228/"), "Name of user");
         deposit.setNbn("urn:nbn:nl:ui:13-4c-1a2b");
 
         var model = new OaiOreConverter(

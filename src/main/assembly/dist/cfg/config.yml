@@ -27,19 +27,17 @@ health:
       schedule:
         checkInterval: 60s
 
-ingestFlow:
-  storageRoot: changeme
-  rdaBagOutputDir: /var/opt/dans.knaw.nl/tmp/dve-outbox
-  autoIngest:
-    dataSuppliers: { }
-    # todo: how to check if an update is authorized?
-    inbox: /var/opt/dans.knaw.nl/tmp/auto-ingest/inbox
-    outbox: /var/opt/dans.knaw.nl/tmp/auto-ingest/outbox
-  migration:
-    dataSuppliers:
-      user001: The Organization Name
-    inbox: /var/opt/dans.knaw.nl/tmp/migration/inbox
-    outbox: /var/opt/dans.knaw.nl/tmp/migration/outbox
+vaultIngest:
+  ocflStorageRoot: changeme
+  bagPackOutputDir: /var/opt/dans.knaw.nl/tmp/dve-outbox
+  dataSupplier: changeme
+  inbox:
+    path: /var/opt/dans.knaw.nl/tmp/auto-ingest/inbox
+    pollingInterval: 500ms
+  outbox:
+    processed: /var/opt/dans.knaw.nl/tmp/auto-ingest/outbox/processed
+    failed: /var/opt/dans.knaw.nl/tmp/auto-ingest/outbox/failed
+    rejected: /var/opt/dans.knaw.nl/tmp/auto-ingest/outbox/rejected
   languages:
     iso6391: /etc/opt/dans.knaw.nl/dd-vault-ingest/iso639-1-to-dv.csv
     iso6392: /etc/opt/dans.knaw.nl/dd-vault-ingest/iso639-2-to-dv.csv

@@ -49,7 +49,7 @@ public class TestDepositManager extends DepositManager {
     }
 
     @Override
-    public Deposit loadDeposit(Path path, Map<String, String> dataSupplierMap) {
+    public Deposit loadDeposit(Path path, String dataSupplier) {
         if (this.deposit != null) {
             return this.deposit;
         }
@@ -57,7 +57,7 @@ public class TestDepositManager extends DepositManager {
         var resource = getClass().getResource(path.toString());
         assert resource != null;
         var resourcePath = Path.of(resource.getPath());
-        return super.loadDeposit(resourcePath, dataSupplierMap);
+        return super.loadDeposit(resourcePath, dataSupplier);
     }
 
     @Override

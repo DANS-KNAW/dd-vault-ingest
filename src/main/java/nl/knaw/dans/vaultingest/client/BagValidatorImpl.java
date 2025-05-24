@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
-public abstract class AbstractBagValidator implements BagValidator {
+public class BagValidatorImpl implements BagValidator {
     private final DefaultApi api;
 
     @Override
@@ -40,7 +40,7 @@ public abstract class AbstractBagValidator implements BagValidator {
 
         var command = new ValidateCommandDto()
             .bagLocation(bagDir.toString())
-            .packageType(getPackageType());
+            .packageType(ValidateCommandDto.PackageTypeEnum.DEPOSIT);
 
         try {
             log.debug("[{}] Validating bag {} with command {}", depositId, bagDir, command);
@@ -70,6 +70,4 @@ public abstract class AbstractBagValidator implements BagValidator {
             result.getProfileVersion(), violations)
         );
     }
-
-    protected abstract ValidateCommandDto.PackageTypeEnum getPackageType();
 }

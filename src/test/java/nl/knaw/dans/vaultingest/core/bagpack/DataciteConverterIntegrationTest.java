@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.vaultingest.core.rdabag;
+package nl.knaw.dans.vaultingest.core.bagpack;
 
 import nl.knaw.dans.vaultingest.core.datacite.DataciteConverter;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteSerializer;
@@ -117,7 +117,7 @@ class DataciteConverterIntegrationTest {
     // serialize to XML, then convert to Node, so we can use XPath to test the output
     private Document loadResource() throws Exception {
         var manager = new TestDepositManager();
-        var deposit = manager.loadDeposit(Path.of("/input/integration-test-complete-bag/c169676f-5315-4d86-bde0-a62dbc915228/"), Map.of("user001","Name of user"));
+        var deposit = manager.loadDeposit(Path.of("/input/integration-test-complete-bag/c169676f-5315-4d86-bde0-a62dbc915228/"), "Name of user");
 
         var resource = new DataciteConverter().convert(deposit);
         var xmlString = new DataciteSerializer().serialize(resource);

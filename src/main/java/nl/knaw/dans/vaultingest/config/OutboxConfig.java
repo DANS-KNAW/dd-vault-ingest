@@ -13,24 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.vaultingest.client;
+package nl.knaw.dans.vaultingest.config;
 
-import io.dropwizard.client.JerseyClientConfiguration;
-import nl.knaw.dans.validatedansbag.client.api.ValidateCommandDto;
-import nl.knaw.dans.validatedansbag.client.resources.DefaultApi;
+import lombok.Data;
 
-import javax.ws.rs.client.Client;
-import java.net.URI;
+import javax.validation.constraints.NotNull;
+import java.nio.file.Path;
 
-public class MigrationBagValidator extends AbstractBagValidator {
-
-    public MigrationBagValidator(DefaultApi api) {
-        super(api);
-    }
-
-    @Override
-    protected ValidateCommandDto.PackageTypeEnum getPackageType() {
-        return ValidateCommandDto.PackageTypeEnum.MIGRATION;
-    }
-
+@Data
+public class OutboxConfig {
+    @NotNull
+    private Path processed;
+    @NotNull
+    private Path failed;
 }

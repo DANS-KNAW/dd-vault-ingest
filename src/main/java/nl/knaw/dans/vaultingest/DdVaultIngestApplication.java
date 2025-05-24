@@ -21,24 +21,18 @@ import io.dropwizard.core.setup.Bootstrap;
 import io.dropwizard.core.setup.Environment;
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.lib.util.ClientProxyBuilder;
-import nl.knaw.dans.lib.util.ManagedExecutorService;
 import nl.knaw.dans.lib.util.PingHealthCheck;
+import nl.knaw.dans.lib.util.inbox.Inbox;
 import nl.knaw.dans.vaultcatalog.client.ApiClient;
 import nl.knaw.dans.vaultcatalog.client.DefaultApi;
-import nl.knaw.dans.vaultingest.client.DepositBagValidator;
-import nl.knaw.dans.vaultingest.client.MigrationBagValidator;
+import nl.knaw.dans.vaultingest.client.BagValidatorImpl;
 import nl.knaw.dans.vaultingest.client.VaultCatalogClientImpl;
 import nl.knaw.dans.vaultingest.config.DdVaultIngestFlowConfig;
-import nl.knaw.dans.vaultingest.core.ConvertToRdaBagTaskFactory;
+import nl.knaw.dans.vaultingest.core.WriteBagPackTaskFactory;
 import nl.knaw.dans.vaultingest.core.deposit.CsvLanguageResolver;
 import nl.knaw.dans.vaultingest.core.deposit.DepositManager;
-import nl.knaw.dans.vaultingest.core.deposit.DepositOutbox;
 import nl.knaw.dans.vaultingest.core.deposit.FileCountryResolver;
-import nl.knaw.dans.vaultingest.core.deposit.MigrationDepositManager;
-import nl.knaw.dans.vaultingest.core.inbox.AutoIngestArea;
-import nl.knaw.dans.vaultingest.core.inbox.IngestAreaDirectoryWatcher;
-import nl.knaw.dans.vaultingest.core.inbox.MigrationIngestArea;
-import nl.knaw.dans.vaultingest.core.rdabag.DefaultRdaBagWriterFactory;
+import nl.knaw.dans.vaultingest.core.bagpack.BagPackWriterFactory;
 import nl.knaw.dans.vaultingest.core.util.IdMinter;
 import nl.knaw.dans.vaultingest.core.xml.XmlReader;
 
@@ -53,23 +47,22 @@ public class DdVaultIngestApplication extends Application<DdVaultIngestFlowConfi
 
     @Override
     public String getName() {
-        return "DD Vault Ingest Flow";
+        return "DD Vault Ingest";
     }
 
     @Override
     public void initialize(final Bootstrap<DdVaultIngestFlowConfig> bootstrap) {
-        // TODO: application initialization
     }
 
     @Override
     public void run(final DdVaultIngestFlowConfig configuration, final Environment environment) throws IOException {
         var languageResolver = new CsvLanguageResolver(
-            configuration.getIngestFlow().getLanguages().getIso6391(),
-            configuration.getIngestFlow().getLanguages().getIso6392()
+            configuration.getVaultIngest().getLanguages().getIso6391(),
+            configuration.getVaultIngest().getLanguages().getIso6392()
         );
 
         var countryResolver = new FileCountryResolver(
-            configuration.getIngestFlow().getSpatialCoverageCountryTermsPath()
+            configuration.getVaultIngest().getSpatialCoverageCountryTermsPath()
         );
         var xmlReader = new XmlReader();
         var validateDansBagProxy = new ClientProxyBuilder<nl.knaw.dans.validatedansbag.invoker.ApiClient, nl.knaw.dans.validatedansbag.client.resources.DefaultApi>()
@@ -78,10 +71,10 @@ public class DdVaultIngestApplication extends Application<DdVaultIngestFlowConfi
             .httpClient(configuration.getValidateDansBag().getHttpClient())
             .defaultApiCtor(nl.knaw.dans.validatedansbag.client.resources.DefaultApi::new)
             .build();
-        var depositValidator = new DepositBagValidator(validateDansBagProxy);
+        var depositValidator = new BagValidatorImpl(validateDansBagProxy);
         var depositManager = new DepositManager(xmlReader);
 
-        var rdaBagWriterFactory = new DefaultRdaBagWriterFactory(
+        var rdaBagWriterFactory = new BagPackWriterFactory(
             environment.getObjectMapper(),
             languageResolver,
             countryResolver
@@ -96,53 +89,27 @@ public class DdVaultIngestApplication extends Application<DdVaultIngestFlowConfi
         var vaultCatalogClient = new VaultCatalogClientImpl(vaultCatalogProxy);
         var idMinter = new IdMinter();
 
-        var autoIngestConvertToRdaBagTaskFactory = new ConvertToRdaBagTaskFactory(
-            configuration.getIngestFlow().getStorageRoot(),
-            configuration.getIngestFlow().getAutoIngest().getDataSuppliers(),
+        var writeBagPackTaskFactory = new WriteBagPackTaskFactory(
+            configuration.getVaultIngest().getOcflStorageRoot(),
+            configuration.getVaultIngest().getDataSupplier(),
+            configuration.getVaultIngest().getOutbox().getProcessed(),
+            configuration.getVaultIngest().getOutbox().getFailed(),
+            configuration.getVaultIngest().getOutbox().getRejected(),
             rdaBagWriterFactory,
             vaultCatalogClient,
             depositValidator,
             idMinter,
             depositManager,
-            configuration.getIngestFlow().getRdaBagOutputDir()
+            configuration.getVaultIngest().getBagPackOutputDir()
         );
 
-        var taskQueue = configuration.getIngestFlow().getTaskQueue().build(environment);
+        environment.lifecycle().manage(Inbox.builder()
+            .inbox(configuration.getVaultIngest().getInbox().getPath())
+            .interval(Math.toIntExact(configuration.getVaultIngest().getInbox().getPollingInterval().toMilliseconds()))
+            .taskFactory(writeBagPackTaskFactory)
+            .executorService(configuration.getVaultIngest().getTaskQueue().build(environment))
 
-        environment.lifecycle().manage(new ManagedExecutorService(taskQueue));
-
-        var ingestAreaDirectoryWatcher = new IngestAreaDirectoryWatcher(
-            500,
-            configuration.getIngestFlow().getAutoIngest().getInbox()
-        );
-
-        environment.lifecycle().manage(new AutoIngestArea(
-            taskQueue,
-            ingestAreaDirectoryWatcher,
-            autoIngestConvertToRdaBagTaskFactory,
-            new DepositOutbox(configuration.getIngestFlow().getAutoIngest().getOutbox())));
-
-        var migrationDepositValidator = new MigrationBagValidator(validateDansBagProxy);
-        var migrationDepositManager = new MigrationDepositManager(xmlReader);
-
-        var migrationIngestConvertToRdaBagTaskFactory = new ConvertToRdaBagTaskFactory(
-            configuration.getIngestFlow().getStorageRoot(),
-            configuration.getIngestFlow().getMigration().getDataSuppliers(),
-            rdaBagWriterFactory,
-            vaultCatalogClient,
-            migrationDepositValidator,
-            idMinter,
-            migrationDepositManager,
-            configuration.getIngestFlow().getRdaBagOutputDir()
-        );
-
-        // TODO: implement API to call this.
-        new MigrationIngestArea(
-            taskQueue,
-            migrationIngestConvertToRdaBagTaskFactory,
-            configuration.getIngestFlow().getMigration().getInbox(),
-            new DepositOutbox(configuration.getIngestFlow().getMigration().getOutbox())
-        );
+            .build());
 
         environment.healthChecks().register(
             "DansBagValidator",

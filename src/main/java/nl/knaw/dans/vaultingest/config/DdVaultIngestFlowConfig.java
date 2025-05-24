@@ -17,12 +17,15 @@
 package nl.knaw.dans.vaultingest.config;
 
 import io.dropwizard.core.Configuration;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-@Getter
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class DdVaultIngestFlowConfig extends Configuration {
     @NotNull
     @Valid
@@ -30,7 +33,7 @@ public class DdVaultIngestFlowConfig extends Configuration {
 
     @NotNull
     @Valid
-    private IngestFlowConfig ingestFlow;
+    private VaultIngestConfig vaultIngest;
 
     @NotNull
     @Valid
