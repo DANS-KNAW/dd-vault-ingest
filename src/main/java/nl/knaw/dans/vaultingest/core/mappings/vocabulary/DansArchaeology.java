@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 
 public class DansArchaeology {
-    public static final String NS = "https://dar.dans.knaw.nl/schema/dansArchaeologyMetadata#";
+    public static final String NS = "https://schemas.dans.knaw.nl/metadatablock/dansArchaeologyMetadata#";
     private static final Model m = ModelFactory.createDefaultModel();
     public static final Property dansArchisZaakId = m.createProperty(NS, "dansArchisZaakId");
     public static final Property dansArchisNumber = m.createProperty(NS, "dansArchisNumber");

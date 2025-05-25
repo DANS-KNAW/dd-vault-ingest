@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 
 public class DansTS {
-    public static final String NS = "https://dar.dans.knaw.nl/schema/dansTemporalSpatial#";
+    public static final String NS = "https://schemas.dans.knaw.nl/metadatablock/dansTemporalSpatial#";
     private static final Model m = ModelFactory.createDefaultModel();
     public static final Property dansTemporalCoverage = m.createProperty(NS, "dansTemporalCoverage");
     public static final Property dansSpatialCoverageControlled = m.createProperty(NS, "dansSpatialCoverageControlled");

@@ -20,7 +20,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 
 public class DansRel {
-    public static final String NS = "https://dar.dans.knaw.nl/schema/2023.04/dansRelationMetadata#";
+    public static final String NS = "https://schemas.dans.knaw.nl/metadatablock/dansRelationMetadata#";
     private static final Model m = ModelFactory.createDefaultModel();
     public static final Property dansAudience = m.createProperty(NS, "dansAudience");
     public static final Property dansCollection = m.createProperty(NS, "dansCollection");

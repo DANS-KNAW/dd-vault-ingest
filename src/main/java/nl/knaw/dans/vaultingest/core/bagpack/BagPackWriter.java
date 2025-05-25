@@ -36,9 +36,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -101,9 +103,58 @@ public class BagPackWriter {
         var tempZipFile = bagPack.resolveSibling(bagPack.getFileName() + ".tmp");
         log.debug("[{}] Zipping directory {} to {}", deposit.getId(), deposit.getBagDir(), tempZipFile);
         ZipUtil.zipDirectory(deposit.getBagDir(), tempZipFile, true);
+        var propertiesFile = bagPack.resolveSibling(bagPack.getFileName() + ".properties");
+        log.debug("[{}] Creating properties file {}", deposit.getId(), propertiesFile);
+        Properties properties = createProperties(tempZipFile);
+        try (var outputStream = Files.newOutputStream(propertiesFile)) {
+            properties.store(outputStream, null);
+        }
         log.debug("[{}] Moving {} to {}", deposit.getId(), tempZipFile, bagPack);
         Files.move(tempZipFile, bagPack);
     }
+
+    private Properties createProperties(Path bagPack) throws IOException {
+        var properties = new Properties();
+        properties.setProperty("creationTime", getCreationTime(bagPack).toString());
+        properties.setProperty("md5", calculateMd5(bagPack));
+        properties.setProperty("nbn", deposit.getNbn());
+        properties.setProperty("ocflObjectVersion", Integer.toString(deposit.getObjectVersion()));
+        return properties;
+    }
+
+    private static Object getCreationTime(Path path) throws IOException {
+        return Files.getAttribute(path, "creationTime", java.nio.file.LinkOption.NOFOLLOW_LINKS);
+    }
+
+    private static String calculateMd5(Path path) throws IOException {
+        try {
+            var md5 = MessageDigest.getInstance("MD5");
+            long totalBytesRead = 0;
+            long fileSize = Files.size(path);
+            try (var is = Files.newInputStream(path)) {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = is.read(buffer)) != -1) {
+                    md5.update(buffer, 0, bytesRead);
+                    totalBytesRead += bytesRead;
+                    if (totalBytesRead % 1048576 == 0) { // Log every MB
+                        log.debug("Read {} MB of {} MB", totalBytesRead / 1048576, fileSize / 1048576);
+                    }
+                }
+                var digest = md5.digest();
+                var hexString = new StringBuilder();
+                for (byte b : digest) {
+                    hexString.append(String.format("%02x", b));
+                }
+                return hexString.toString();
+            }
+        }
+        catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException("MD5 algorithm not found", e);
+        }
+    }
+
+
 
     private void modifyTagManifests() throws IOException {
         for (var algorithm : tagManifestAlgorithms) {
