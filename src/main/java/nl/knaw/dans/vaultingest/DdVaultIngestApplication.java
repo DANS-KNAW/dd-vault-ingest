@@ -22,6 +22,7 @@ import io.dropwizard.core.setup.Environment;
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.lib.util.ClientProxyBuilder;
 import nl.knaw.dans.lib.util.PingHealthCheck;
+import nl.knaw.dans.lib.util.PropertiesBasedDirectoryComparator;
 import nl.knaw.dans.lib.util.inbox.Inbox;
 import nl.knaw.dans.vaultcatalog.client.ApiClient;
 import nl.knaw.dans.vaultcatalog.client.DefaultApi;
@@ -29,14 +30,15 @@ import nl.knaw.dans.vaultingest.client.BagValidatorImpl;
 import nl.knaw.dans.vaultingest.client.VaultCatalogClientImpl;
 import nl.knaw.dans.vaultingest.config.DdVaultIngestFlowConfig;
 import nl.knaw.dans.vaultingest.core.WriteBagPackTaskFactory;
+import nl.knaw.dans.vaultingest.core.bagpack.BagPackWriterFactory;
 import nl.knaw.dans.vaultingest.core.deposit.CsvLanguageResolver;
 import nl.knaw.dans.vaultingest.core.deposit.DepositManager;
 import nl.knaw.dans.vaultingest.core.deposit.FileCountryResolver;
-import nl.knaw.dans.vaultingest.core.bagpack.BagPackWriterFactory;
 import nl.knaw.dans.vaultingest.core.util.IdMinter;
 import nl.knaw.dans.vaultingest.core.xml.XmlReader;
 
 import java.io.IOException;
+import java.time.Instant;
 
 @Slf4j
 public class DdVaultIngestApplication extends Application<DdVaultIngestFlowConfig> {
@@ -106,9 +108,9 @@ public class DdVaultIngestApplication extends Application<DdVaultIngestFlowConfi
         environment.lifecycle().manage(Inbox.builder()
             .inbox(configuration.getVaultIngest().getInbox().getPath())
             .interval(Math.toIntExact(configuration.getVaultIngest().getInbox().getPollingInterval().toMilliseconds()))
+            .inboxItemComparator(new PropertiesBasedDirectoryComparator<>("deposit.properties", "creation.timestamp", Instant::parse))
             .taskFactory(writeBagPackTaskFactory)
             .executorService(configuration.getVaultIngest().getTaskQueue().build(environment))
-
             .build());
 
         environment.healthChecks().register(

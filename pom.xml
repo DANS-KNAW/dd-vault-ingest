@@ -37,7 +37,7 @@
         <dd-validate-dans-bag-api.version>1.0.0</dd-validate-dans-bag-api.version>
         <!-- TODO: move to parent pom -->
         <dd-vault-catalog-api.version>0.9.0</dd-vault-catalog-api.version>
-        <dans-java-utils.version>1.7.1</dans-java-utils.version>
+        <dans-java-utils.version>2.0.0</dans-java-utils.version>
     </properties>
 
     <scm>
@@ -62,7 +62,6 @@
         <dependency>
             <groupId>nl.knaw.dans</groupId>
             <artifactId>dans-java-utils</artifactId>
-            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>nl.knaw.dans</groupId>
