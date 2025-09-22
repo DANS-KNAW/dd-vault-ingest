@@ -34,8 +34,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.riot.SysRIOT;
-import org.apache.jena.riot.writer.JsonLD10Writer;
 import org.apache.jena.sparql.util.Context;
+import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.DC_11;
@@ -100,10 +100,9 @@ public class OaiOreSerializer {
             "   }\n" +
             " }";
 
-        context.set(JsonLD10Writer.JSONLD_FRAME, contextStr);
-
+        context.set(Symbol.create("jsonld.frame"), contextStr);
         var writer = RDFWriter.create()
-            .format(RDFFormat.JSONLD10_FRAME_PRETTY)
+            .format(RDFFormat.JSONLD11_PRETTY)
             .source(DatasetFactory.wrap(model).asDatasetGraph())
             .context(context)
             .build();
