@@ -17,6 +17,7 @@ package nl.knaw.dans.vaultingest.core.oaiore;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jsonldjava.core.JsonLdOptions;
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.vaultingest.core.mappings.vocabulary.DVCitation;
 import nl.knaw.dans.vaultingest.core.mappings.vocabulary.DVCore;
@@ -28,21 +29,21 @@ import nl.knaw.dans.vaultingest.core.mappings.vocabulary.DansTS;
 import nl.knaw.dans.vaultingest.core.mappings.vocabulary.Datacite;
 import nl.knaw.dans.vaultingest.core.mappings.vocabulary.ORE;
 import nl.knaw.dans.vaultingest.core.mappings.vocabulary.PROV;
-import org.apache.jena.query.DatasetFactory;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.riot.JsonLDWriteContext;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.riot.SysRIOT;
-import org.apache.jena.riot.writer.JsonLD10Writer;
-import org.apache.jena.sparql.util.Context;
+
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.DC_11;
 import org.apache.jena.vocabulary.SchemaDO;
 
 import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -64,7 +65,7 @@ public class OaiOreSerializer {
             ORE.ResourceMap,
         };
 
-        applyNamespaces(model);
+        setNamespacePrefixes(model);
 
         var properties = new HashMap<String, Object>();
         properties.put("prettyTypes", topLevelResources);
@@ -82,36 +83,36 @@ public class OaiOreSerializer {
     }
 
     public String serializeAsJsonLd(Model model) {
-        var context = new Context();
+        /*
+         * Framing is a way to control the layout of the resulting JSON-LD document. We want to get a similar result as Dataverse. By default, Jena will produce a document with the key "@graph", which
+         * contains an array of resources. The document we are producing describes a resource map, which is a single resource. The aggregation it describes (i.e., the dataset) can be embedded in the
+         * resource map, as in their turn, can the files that are aggregated by the dataset.
+         *
+         * Please note that the code contains several pieces that must not be changed, or Jena will revert to using "@graph", sometimes seven an empty "@graph".
+         */
 
-        applyNamespaces(model);
+        // The type must be set to "ResourceMap" so that the resource-map in the model will be used as the root resource.
+        // The context must be created as a string; setNamespacePrefixes has no effect.
+        var frame = String.format("""
+            {
+              "@context": %s,
+              "@type": "ore:ResourceMap"
+            }
+            """, namespacesAsJsonObject(getUsedNamespaces(model)));
 
-        var namespaces = namespacesAsJsonObject(getUsedNamespaces(model));
-        var contextStr = "{ \"@context\": [\n" +
-            "    \"https://w3id.org/ore/context\",\n" +
-            namespaces +
-            "  ],\n" +
-            "\n" +
-            "   \"describes\": {\n" +
-            "     \"@type\": \"Aggregation\",\n" +
-            "     \"isDescribedBy\":  { \"@embed\": false } ,\n" +
-            "     \"aggregates\":  { \"@embed\": true }  ,\n" +
-            "     \"proxies\":  { \"@embed\": true }\n" +
-            "   }\n" +
-            " }";
+        JsonLdOptions opts = new JsonLdOptions();
+        opts.setOmitGraph(true); // To suppress inserting the "@graph" key. Otherwise, Jena will insert it, even though it is not necessary.
+        opts.setPruneBlankNodeIdentifiers(true); // To suppress generating IDs for nodes that do not have an explicit identifier.
 
-        context.set(JsonLD10Writer.JSONLD_FRAME, contextStr);
+        var ctx = new JsonLDWriteContext(); // We use JSON-LD 1.0. TODO: How to achieve the same result with JSON-LD 1.1?
+        ctx.setFrame(frame); // Use the frame defined above.
+        ctx.setOptions(opts);
 
-        var writer = RDFWriter.create()
-            .format(RDFFormat.JSONLD10_FRAME_PRETTY)
-            .source(DatasetFactory.wrap(model).asDatasetGraph())
-            .context(context)
-            .build();
-
-        var outputWriter = new StringWriter();
-        writer.output(outputWriter);
-
-        return outputWriter.toString();
+        return RDFWriter.create()
+            .source(model) // Do not wrap the model in a graph
+            .format(RDFFormat.JSONLD10_FRAME_PRETTY) // Use JSON-LD 1.0. It is essential to use this format, otherwise the frame will not be applied.
+            .context(ctx)
+            .asString();
     }
 
     private String namespacesAsJsonObject(Map<String, String> namespaces) {
@@ -154,7 +155,7 @@ public class OaiOreSerializer {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private void applyNamespaces(Model model) {
+    private void setNamespacePrefixes(Model model) {
         var namespaces = getNamespaces();
 
         for (var namespace : namespaces.entrySet()) {
