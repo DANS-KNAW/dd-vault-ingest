@@ -21,7 +21,6 @@ import nl.knaw.dans.vaultingest.core.deposit.DepositManager;
 import nl.knaw.dans.vaultingest.core.xml.XmlReader;
 
 import java.nio.file.Path;
-import java.util.Map;
 
 public class TestDepositManager extends DepositManager {
     private Deposit deposit;
@@ -42,10 +41,6 @@ public class TestDepositManager extends DepositManager {
     private TestDepositManager(Deposit deposit) {
         super(new XmlReader());
         this.deposit = deposit;
-    }
-
-    public static TestDepositManager ofDeposit(Deposit deposit) {
-        return new TestDepositManager(deposit);
     }
 
     @Override
