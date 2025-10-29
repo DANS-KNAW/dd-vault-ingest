@@ -39,7 +39,7 @@ public class BagValidatorImpl implements BagValidator {
         }
 
         var command = new ValidateCommandDto()
-            .bagLocation(bagDir.toString())
+            .bagLocation(bagDir.toAbsolutePath().toString())
             .packageType(ValidateCommandDto.PackageTypeEnum.DEPOSIT);
 
         try {

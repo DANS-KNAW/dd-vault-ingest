@@ -19,6 +19,8 @@ echo -n "Pre-creating log..."
 TEMPDIR=data
 touch $TEMPDIR/dd-vault-ingest.log
 mkdir $TEMPDIR/inbox
-mkdir $TEMPDIR/outbox
-mkdir $TEMPDIR/rda-bag
+mkdir $TEMPDIR/outbox/processed
+mkdir $TEMPDIR/outbox/failed
+mkdir $TEMPDIR/outbox/rejected
+mkdir $TEMPDIR/bag-pack-outbox
 echo "OK"

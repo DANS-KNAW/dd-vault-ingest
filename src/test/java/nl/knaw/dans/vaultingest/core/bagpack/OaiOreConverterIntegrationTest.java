@@ -17,6 +17,7 @@ package nl.knaw.dans.vaultingest.core.bagpack;
 
 import lombok.Builder;
 import lombok.Value;
+import nl.knaw.dans.vaultingest.config.ContactPersonConfig;
 import nl.knaw.dans.vaultingest.core.deposit.Deposit;
 import nl.knaw.dans.vaultingest.core.mappings.vocabulary.DVCitation;
 import nl.knaw.dans.vaultingest.core.mappings.vocabulary.DVCore;
@@ -640,10 +641,15 @@ public class OaiOreConverterIntegrationTest {
         var deposit = depositManager.loadDeposit(Path.of("/input/integration-test-complete-bag/c169676f-5315-4d86-bde0-a62dbc915228/"), "Name of user");
         deposit.setNbn("urn:nbn:nl:ui:13-4c-1a2b");
 
+        var contactPersonConfig = new ContactPersonConfig();
+        contactPersonConfig.setName("I Lastname");
+        contactPersonConfig.setEmail("test@example.com");
+        contactPersonConfig.setAffiliation("Example Org");
+
         var model = new OaiOreConverter(
             TestLanguageResolverSingleton.getInstance(),
             TestCountryResolverSingleton.getInstance()
-        ).convert(deposit);
+        ).convert(deposit, contactPersonConfig);
 
         return ModelObject.builder()
             .deposit(deposit)

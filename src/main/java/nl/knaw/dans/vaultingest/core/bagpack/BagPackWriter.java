@@ -20,6 +20,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.lib.util.ZipUtil;
+import nl.knaw.dans.vaultingest.config.ContactPersonConfig;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteConverter;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteSerializer;
 import nl.knaw.dans.vaultingest.core.deposit.Deposit;
@@ -53,6 +54,10 @@ public class BagPackWriter {
     private final Deposit deposit;
 
     @NonNull
+    private final ContactPersonConfig contactPersonConfig;
+
+
+    @NonNull
     private final DataciteSerializer dataciteSerializer;
 
     @NonNull
@@ -82,7 +87,7 @@ public class BagPackWriter {
         checksummedWriteToOutput(Path.of("metadata/datacite.xml"), dataciteXml);
 
         log.debug("[{}] Adding metadata/oai-ore[.rdf|.jsonld]", deposit.getId());
-        var oaiOre = oaiOreConverter.convert(deposit);
+        var oaiOre = oaiOreConverter.convert(deposit, contactPersonConfig);
         var rdf = oaiOreSerializer.serializeAsRdf(oaiOre);
         var jsonld = oaiOreSerializer.serializeAsJsonLd(oaiOre);
         checksummedWriteToOutput(Path.of("metadata/oai-ore.rdf"), rdf);

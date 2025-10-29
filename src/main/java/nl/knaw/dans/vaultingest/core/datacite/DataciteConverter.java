@@ -113,13 +113,9 @@ public class DataciteConverter {
     private Resource.Identifier getIdentifier(Deposit deposit) {
         var id = deposit.getDoi();
 
-        if (id == null) {
-            return null;
-        }
-
         var identifier = new Resource.Identifier();
         identifier.setIdentifierType("DOI");
-        identifier.setValue(id);
+        identifier.setValue(id == null ? ":none" : id);
 
         return identifier;
     }

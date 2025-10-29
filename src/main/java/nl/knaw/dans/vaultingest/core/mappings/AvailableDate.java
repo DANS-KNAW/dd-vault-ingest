@@ -34,7 +34,6 @@ public class AvailableDate extends Base {
         return toAvailable(resource, available);
     }
 
-    // DFILE001
     static Optional<Statement> toAvailable(Resource resource, LocalDate available) {
         return toBasicTerm(resource, DCTerms.available, available.format(formatter));
     }

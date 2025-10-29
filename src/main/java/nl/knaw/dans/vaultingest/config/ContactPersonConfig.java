@@ -13,29 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.knaw.dans.vaultingest.config;
 
-import io.dropwizard.core.Configuration;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.NonNull;
 
-import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class DdVaultIngestFlowConfig extends Configuration {
+public class ContactPersonConfig {
     @NotNull
-    @Valid
-    private ValidateDansBagConfig validateDansBag;
-
+    private String name;
     @NotNull
-    @Valid
-    private VaultIngestConfig vaultIngest;
-
-    @NotNull
-    @Valid
-    private VaultCatalogConfig vaultCatalog;
+    @Email
+    private String email;
+    // Can be null
+    private String affiliation;
 }

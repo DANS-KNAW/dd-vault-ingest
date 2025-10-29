@@ -16,13 +16,14 @@
 package nl.knaw.dans.vaultingest.config;
 
 import io.dropwizard.client.JerseyClientConfiguration;
+import lombok.Data;
 import lombok.Getter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 
-@Getter
+@Data
 public class VaultCatalogConfig {
     @Valid
     @NotNull

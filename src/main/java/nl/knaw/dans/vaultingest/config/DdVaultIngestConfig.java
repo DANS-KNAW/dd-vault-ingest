@@ -13,48 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package nl.knaw.dans.vaultingest.config;
 
+import io.dropwizard.core.Configuration;
 import lombok.Data;
-import lombok.Getter;
-import nl.knaw.dans.lib.util.ExecutorServiceFactory;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.nio.file.Path;
 
 @Data
-public class VaultIngestConfig {
+@EqualsAndHashCode(callSuper = true)
+public class DdVaultIngestConfig extends Configuration {
     @NotNull
     @Valid
-    private ContactPersonConfig contactPerson;
-
-    @NotNull
-    private String ocflStorageRoot;
-
-    @NotNull
-    private Path bagPackOutputDir;
-
-    @NotNull
-    private String dataSupplier;
+    private ValidateDansBagConfig validateDansBag;
 
     @NotNull
     @Valid
-    private InboxConfig inbox;
+    private VaultIngestConfig vaultIngest;
 
     @NotNull
     @Valid
-    private OutboxWithRejectedConfig outbox;
-
-    @NotNull
-    @Valid
-    private LanguageConfig languages;
-
-    @NotNull
-    @Valid
-    private Path spatialCoverageCountryTermsPath;
-
-    @NotNull
-    @Valid
-    private ExecutorServiceFactory taskQueue;
+    private VaultCatalogConfig vaultCatalog;
 }
