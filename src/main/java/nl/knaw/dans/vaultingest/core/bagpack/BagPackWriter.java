@@ -98,7 +98,8 @@ public class BagPackWriter {
         var pidMappingsSerialized = pidMappingSerializer.serialize(pidMappings);
         checksummedWriteToOutput(Path.of("metadata/pid-mapping.txt"), pidMappingsSerialized);
 
-        // bag-info.txt does not need changing, as no payload files are added or removed
+        deposit.getBag().putBagInfoValue("Contact-Name", contactPersonConfig.getName());
+        deposit.getBag().putBagInfoValue("Contact-Email", contactPersonConfig.getEmail());
 
         // must be last, because all other files must have been written
         log.debug("[{}] Modifying tagmanifest-*.txt files", deposit.getId());
