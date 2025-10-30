@@ -48,6 +48,6 @@ public class Datacite {
     }
 
     public static LocalDate getPublicationDate(Deposit deposit) {
-        return AvailableDate.getAvailableDate(deposit.getDdm());
+        return Available.getAvailableDate(deposit.getDdm());
     }
 }
