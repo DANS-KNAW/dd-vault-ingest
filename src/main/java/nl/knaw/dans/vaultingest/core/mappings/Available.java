@@ -16,36 +16,47 @@
 package nl.knaw.dans.vaultingest.core.mappings;
 
 import nl.knaw.dans.vaultingest.core.deposit.Deposit;
+import nl.knaw.dans.vaultingest.core.mappings.vocabulary.DVCitation;
 import nl.knaw.dans.vaultingest.core.xml.XPathEvaluator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.vocabulary.DCTerms;
 import org.w3c.dom.Document;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
-public class AvailableDate extends Base {
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+public class Available extends Base {
+    private static final DateTimeFormatter yyyyMMddFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public static Optional<Statement> toRDF(Resource resource, Deposit deposit) {
-        var available = getAvailableDate(deposit.getDdm());
-        return toAvailable(resource, available);
+    public static List<Statement> toRDF(Resource resource, Deposit deposit) {
+        return toDistributionDate(resource, getAvailableDate(deposit.getDdm())).stream().toList();
     }
 
-    static Optional<Statement> toAvailable(Resource resource, LocalDate available) {
-        return toBasicTerm(resource, DCTerms.available, available.format(formatter));
-    }
-
-    static LocalDate getAvailableDate(Document document) {
+    public static LocalDate getAvailableDate(Document document) {
         return XPathEvaluator.strings(document, "/ddm:DDM/ddm:profile/ddm:available")
             .findFirst()
-            .map(AvailableDate::toYearMonthDayFormat)
+            .map(Available::toYearMonthDayFormat)
             .orElse(null);
+    }
+
+    public static LocalDate getEmbargoDate(Document document) {
+        var availableDate = getAvailableDate(document);
+        // If after now then it's an embargo date otherwise null
+        if (availableDate != null && availableDate.isAfter(LocalDate.now())) {
+            return availableDate;
+        }
+        else {
+            return null;
+        }
     }
 
     static LocalDate toYearMonthDayFormat(String text) {
         return LocalDate.parse(text);
+    }
+
+    static Optional<Statement> toDistributionDate(Resource resource, LocalDate distributionDate) {
+        return toBasicTerm(resource, DVCitation.distributionDate, yyyyMMddFormatter.format(distributionDate));
     }
 }
