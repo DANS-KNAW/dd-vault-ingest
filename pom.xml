@@ -25,7 +25,7 @@
         <version>1.9.0</version>
     </parent>
     <artifactId>dd-vault-ingest</artifactId>
-    <version>1.6.1-SNAPSHOT</version>
+    <version>1.7.0</version>
 
     <name>DD Vault Ingest</name>
     <url>https://github.com/DANS-KNAW/dd-vault-ingest</url>
@@ -42,7 +42,7 @@
 
     <scm>
         <developerConnection>scm:git:ssh://github.com/DANS-KNAW/${project.artifactId}</developerConnection>
-        <tag>HEAD</tag>
+        <tag>v1.7.0</tag>
     </scm>
 
     <dependencies>
