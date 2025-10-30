@@ -28,7 +28,7 @@ import nl.knaw.dans.vaultcatalog.client.ApiClient;
 import nl.knaw.dans.vaultcatalog.client.DefaultApi;
 import nl.knaw.dans.vaultingest.client.BagValidatorImpl;
 import nl.knaw.dans.vaultingest.client.VaultCatalogClientImpl;
-import nl.knaw.dans.vaultingest.config.DdVaultIngestFlowConfig;
+import nl.knaw.dans.vaultingest.config.DdVaultIngestConfig;
 import nl.knaw.dans.vaultingest.core.WriteBagPackTaskFactory;
 import nl.knaw.dans.vaultingest.core.bagpack.BagPackWriterFactory;
 import nl.knaw.dans.vaultingest.core.deposit.CsvLanguageResolver;
@@ -41,7 +41,7 @@ import java.io.IOException;
 import java.time.Instant;
 
 @Slf4j
-public class DdVaultIngestApplication extends Application<DdVaultIngestFlowConfig> {
+public class DdVaultIngestApplication extends Application<DdVaultIngestConfig> {
 
     public static void main(final String[] args) throws Exception {
         new DdVaultIngestApplication().run(args);
@@ -53,11 +53,11 @@ public class DdVaultIngestApplication extends Application<DdVaultIngestFlowConfi
     }
 
     @Override
-    public void initialize(final Bootstrap<DdVaultIngestFlowConfig> bootstrap) {
+    public void initialize(final Bootstrap<DdVaultIngestConfig> bootstrap) {
     }
 
     @Override
-    public void run(final DdVaultIngestFlowConfig configuration, final Environment environment) throws IOException {
+    public void run(final DdVaultIngestConfig configuration, final Environment environment) throws IOException {
         var languageResolver = new CsvLanguageResolver(
             configuration.getVaultIngest().getLanguages().getIso6391(),
             configuration.getVaultIngest().getLanguages().getIso6392()
@@ -77,6 +77,7 @@ public class DdVaultIngestApplication extends Application<DdVaultIngestFlowConfi
         var depositManager = new DepositManager(xmlReader);
 
         var rdaBagWriterFactory = new BagPackWriterFactory(
+            configuration.getVaultIngest().getContactPerson(),
             environment.getObjectMapper(),
             languageResolver,
             countryResolver

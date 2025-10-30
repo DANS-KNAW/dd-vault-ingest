@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.vaultingest.core.oaiore;
 
+import nl.knaw.dans.vaultingest.config.ContactPersonConfig;
 import nl.knaw.dans.vaultingest.core.deposit.CountryResolver;
 import nl.knaw.dans.vaultingest.core.deposit.Deposit;
 import nl.knaw.dans.vaultingest.core.deposit.LanguageResolver;
@@ -23,6 +24,7 @@ import nl.knaw.dans.vaultingest.core.mappings.AlternativeTitles;
 import nl.knaw.dans.vaultingest.core.mappings.Audiences;
 import nl.knaw.dans.vaultingest.core.mappings.Authors;
 import nl.knaw.dans.vaultingest.core.mappings.CollectionDates;
+import nl.knaw.dans.vaultingest.core.mappings.ContactPerson;
 import nl.knaw.dans.vaultingest.core.mappings.Contributors;
 import nl.knaw.dans.vaultingest.core.mappings.DansRelations;
 import nl.knaw.dans.vaultingest.core.mappings.DataFile;
@@ -68,7 +70,7 @@ public class OaiOreConverter {
         this.countryResolver = countryResolver;
     }
 
-    public Model convert(Deposit deposit) {
+    public Model convert(Deposit deposit, ContactPersonConfig contactPerson) {
         var model = ModelFactory.createDefaultModel();
 
         var resourceMap = createResourceMap(deposit, model);
@@ -80,6 +82,8 @@ public class OaiOreConverter {
 
         model.add(OtherIds.toRDF(resource, deposit));
         model.add(Authors.toRDF(resource, deposit));
+
+        model.add(ContactPerson.toRDF(resource, contactPerson));
 
         model.add(Descriptions.toRDF(resource, deposit));
         model.add(Subjects.toRDF(resource, deposit));

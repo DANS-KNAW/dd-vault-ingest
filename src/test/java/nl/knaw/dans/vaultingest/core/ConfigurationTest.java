@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import io.dropwizard.configuration.YamlConfigurationFactory;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.jersey.validation.Validators;
-import nl.knaw.dans.vaultingest.config.DdVaultIngestFlowConfig;
+import nl.knaw.dans.vaultingest.config.DdVaultIngestConfig;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,44 +27,36 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class ConfigurationTest {
 
     private final Path testDir = new File("target/test/" + getClass().getSimpleName()).toPath();
+    private YamlConfigurationFactory<DdVaultIngestConfig> factory;
 
     @BeforeEach
-    void clear() throws IOException {
+    void setUp() throws IOException {
         FileUtils.deleteQuietly(testDir.toFile());
-    }
-    private final YamlConfigurationFactory<DdVaultIngestFlowConfig> factory;
-
-    {
+        Files.createDirectories(testDir);
         final var mapper = Jackson.newObjectMapper().enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        factory = new YamlConfigurationFactory<>(DdVaultIngestFlowConfig.class, Validators.newValidator(), mapper, "dw");
+        factory = new YamlConfigurationFactory<>(DdVaultIngestConfig.class, Validators.newValidator(), mapper, "dw");
     }
 
     @Test
     public void assembly_dist_cfg_does_not_throw() throws IOException {
         File cfgFile = testDir.resolve("config.yml").toFile();
-        FileUtils.write(cfgFile, rewriteFilePaths("src/main/assembly/dist/cfg/config.yml"), StandardCharsets.UTF_8);
+        Files.copy(Paths.get("src/main/assembly/dist/cfg/config.yml"), cfgFile.toPath());
         assertDoesNotThrow(() -> factory.build(FileInputStream::new, cfgFile.toString()));
     }
 
     @Test
     public void debug_etc_does_not_throw() throws IOException {
         File cfgFile = testDir.resolve("config.yml").toFile();
-        FileUtils.write(cfgFile, rewriteFilePaths("src/test/resources/debug-etc/config.yml"), StandardCharsets.UTF_8);
+        Files.copy(Path.of("src/test/resources/debug-etc/config.yml"), cfgFile.toPath());
         assertDoesNotThrow(() -> factory.build(FileInputStream::new, cfgFile.toString()));
-    }
-
-    private String rewriteFilePaths(String configYmlContent) throws IOException {
-        // prevent ConfigurationValidationException ... does not exist but is required
-        // TODO why only @FileMustExist for the language files?
-        return FileUtils.readFileToString(new File(configYmlContent), StandardCharsets.UTF_8)
-            .replaceAll("(iso639[12]): .*/","$1: src/main/assembly/dist/cfg/");
     }
 }

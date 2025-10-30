@@ -21,7 +21,6 @@ import lombok.Setter;
 import lombok.ToString;
 import nl.knaw.dans.vaultingest.core.xml.XPathEvaluator;
 import nl.knaw.dans.vaultingest.core.xml.XmlNamespaces;
-import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 
 import java.nio.file.Path;
@@ -114,16 +113,12 @@ public class Deposit {
         };
 
         var dois = XPathEvaluator.strings(ddm, expr).toList();
-
-        if (dois.size() != 1) {
-            throw new IllegalStateException("There should be exactly one DOI in the DDM, but found " + dois.size() + " DOIs");
+        String doi = null;
+        if (dois.size() > 1) {
+            throw new IllegalStateException("There should be at most one DOI in the DDM, but found " + dois.size() + " DOIs");
         }
-
-        var doi = dois.get(0);
-
-        if (StringUtils.isBlank(doi)) {
-            throw new IllegalStateException("DOI is blank in the DDM");
-        }
+        else if (dois.size() == 1)
+            doi = dois.get(0);
 
         return doi;
     }

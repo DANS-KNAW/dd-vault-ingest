@@ -28,6 +28,10 @@ health:
         checkInterval: 60s
 
 vaultIngest:
+  contactPerson:
+    name: changeme
+    email: changeme@example.com
+#    affiliation: changeme # optional
   ocflStorageRoot: changeme
   bagPackOutputDir: /var/opt/dans.knaw.nl/tmp/dve-outbox
   dataSupplier: changeme
