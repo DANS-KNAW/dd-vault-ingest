@@ -81,7 +81,7 @@ public class Descriptions extends Base {
         return result;
     }
 
-    static Stream<Description> getAllProfileDescriptions(Document document) {
+    public static Stream<Description> getAllProfileDescriptions(Document document) {
         return XPathEvaluator.strings(document,
             "/ddm:DDM/ddm:profile/dc:description",
             "/ddm:DDM/ddm:profile/dcterms:description"

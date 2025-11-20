@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.lib.util.ZipUtil;
 import nl.knaw.dans.vaultingest.config.ContactPersonConfig;
+import nl.knaw.dans.vaultingest.core.baginfo.BagInfoConverter;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteConverter;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteSerializer;
 import nl.knaw.dans.vaultingest.core.deposit.Deposit;
@@ -75,6 +76,9 @@ public class BagPackWriter {
     @NonNull
     private final OaiOreConverter oaiOreConverter;
 
+    @NonNull
+    private final BagInfoConverter bagInfoConverter;
+
     private final Map<Path, Map<SupportedAlgorithm, String>> changedChecksums = new HashMap<>();
     private Set<SupportedAlgorithm> tagManifestAlgorithms;
 
@@ -98,8 +102,8 @@ public class BagPackWriter {
         var pidMappingsSerialized = pidMappingSerializer.serialize(pidMappings);
         checksummedWriteToOutput(Path.of("metadata/pid-mapping.txt"), pidMappingsSerialized);
 
-        deposit.getBag().putBagInfoValue("Contact-Name", contactPersonConfig.getName());
-        deposit.getBag().putBagInfoValue("Contact-Email", contactPersonConfig.getEmail());
+        log.debug("[{}] Adding to bag-info.txt", deposit.getId());
+        bagInfoConverter.convert(deposit, contactPersonConfig, deposit.getBag());
 
         // must be last, because all other files must have been written
         log.debug("[{}] Modifying tagmanifest-*.txt files", deposit.getId());

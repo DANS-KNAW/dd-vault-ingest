@@ -31,7 +31,7 @@ public class Titles {
         return rdfTitle(resource, getTitle(deposit.getDdm()));
     }
 
-    static String getTitle(Document ddm) {
+    public static String getTitle(Document ddm) {
         return XPathEvaluator.strings(ddm, "/ddm:DDM/ddm:profile/dc:title", "ddm:DDM/ddm:profile/dcterms:title")
             .map(String::trim)
             .findFirst()

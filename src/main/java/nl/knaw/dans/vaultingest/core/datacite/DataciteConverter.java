@@ -47,6 +47,8 @@ public class DataciteConverter {
         resource.setDescriptions(getDescriptions(deposit));
         // DATACITE015
         resource.setPublicationYear(getPublicationYear(deposit));
+        // DATACITE013A
+        resource.setPublisher(getPublisher(deposit));
 
         return resource;
     }
@@ -59,6 +61,12 @@ public class DataciteConverter {
         }
 
         return date.format(yearFormatter);
+    }
+
+    private Resource.Publisher getPublisher(Deposit deposit) {
+        Resource.Publisher publisher = new Resource.Publisher();
+        publisher.setValue(deposit.getDataSupplier());
+        return publisher;
     }
 
     private Resource.Titles getTitles(Deposit deposit) {
