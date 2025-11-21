@@ -17,6 +17,7 @@ package nl.knaw.dans.vaultingest.core.bagpack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.knaw.dans.vaultingest.config.ContactPersonConfig;
+import nl.knaw.dans.vaultingest.core.baginfo.BagInfoConverter;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteConverter;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteSerializer;
 import nl.knaw.dans.vaultingest.core.deposit.CountryResolver;
@@ -37,6 +38,7 @@ public class BagPackWriterFactory {
     private final DataciteConverter dataciteConverter;
     private final PidMappingConverter pidMappingConverter;
     private final OaiOreConverter oaiOreConverter;
+    private final BagInfoConverter bagInfoConverter;
 
     public BagPackWriterFactory(ContactPersonConfig contactPersonConfig, ObjectMapper objectMapper, LanguageResolver languageResolver, CountryResolver countryResolver) {
         this.contactPersonConfig = contactPersonConfig;
@@ -46,6 +48,7 @@ public class BagPackWriterFactory {
         this.dataciteConverter = new DataciteConverter();
         this.pidMappingConverter = new PidMappingConverter();
         this.oaiOreConverter = new OaiOreConverter(languageResolver, countryResolver);
+        this.bagInfoConverter = new BagInfoConverter();
     }
 
     public BagPackWriter createBagPackWriter(Deposit deposit) {
@@ -57,7 +60,8 @@ public class BagPackWriterFactory {
             oaiOreSerializer,
             dataciteConverter,
             pidMappingConverter,
-            oaiOreConverter
+            oaiOreConverter,
+            bagInfoConverter
         );
     }
 }

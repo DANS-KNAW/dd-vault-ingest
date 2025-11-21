@@ -96,4 +96,8 @@ public class DepositBag {
         MetadataWriter.writeBagMetadata(bag.getMetadata(), Version.LATEST_BAGIT_VERSION(), bag.getRootDir(), StandardCharsets.UTF_8);
 
     }
+
+    public List<String> getBagInfoValues(String key) {
+        return bag.getMetadata().get(key);
+    }
 }
