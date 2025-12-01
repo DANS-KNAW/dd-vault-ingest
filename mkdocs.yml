@@ -22,13 +22,20 @@ repo_name: DANS-KNAW/dd-vault-ingest
 repo_url: https://github.com/DANS-KNAW/dd-vault-ingest
 
 nav:
-  - Manual: index.md
-  - Development: dev.md
-  - ⇒ DANS Data Station Architecture: arch.md
+  - Manual:
+      - Description: index.md
+      - Installation: installation.md
+      - Configuration: config.md
+      - Context: context.md
+  - Development:
+      - Overview: dev.md
+      - Local debugging: dev-debugging.md
 
 extra:
-  deposit_directory: https://dans-knaw.github.io/dans-datastation-architecture/deposit-directory/
-  dans_bagit_profile: https://dans-knaw.github.io/dans-bagit-profile/versions/1.0.0/
+  vault_as_a_service_url: https://dans-knaw.github.io/dans-datastation-architecture/vaas/
+  transfer_service_url: https://dans-knaw.github.io/dans-datastation-architecture/dans-microservices/#dd-transfer-to-vault
+  dd_validate_dans_bag_url: https://dans-knaw.github.io/dd-validate-dans-bag/
+  dd_vault_catalog_url: https://dans-knaw.github.io/dd-vault-catalog/
 
 plugins:
   - markdownextradata

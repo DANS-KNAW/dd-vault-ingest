@@ -23,6 +23,10 @@ health:
         checkInterval: 60s
 
 vaultIngest:
+  contactPerson:
+    name: changeme
+    email: changeme@example.com
+  #    affiliation: changeme # optional
   ocflStorageRoot: testroot
   bagPackOutputDir: data/bag-pack-outbox
   dataSupplier: The Organization Name

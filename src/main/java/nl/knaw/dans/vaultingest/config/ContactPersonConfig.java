@@ -16,45 +16,18 @@
 package nl.knaw.dans.vaultingest.config;
 
 import lombok.Data;
-import lombok.Getter;
-import nl.knaw.dans.lib.util.ExecutorServiceFactory;
+import lombok.NonNull;
 
-import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import java.nio.file.Path;
 
 @Data
-public class VaultIngestConfig {
+public class ContactPersonConfig {
     @NotNull
-    @Valid
-    private ContactPersonConfig contactPerson;
-
+    private String name;
     @NotNull
-    private String ocflStorageRoot;
-
-    @NotNull
-    private Path bagPackOutputDir;
-
-    @NotNull
-    private String dataSupplier;
-
-    @NotNull
-    @Valid
-    private InboxConfig inbox;
-
-    @NotNull
-    @Valid
-    private OutboxWithRejectedConfig outbox;
-
-    @NotNull
-    @Valid
-    private LanguageConfig languages;
-
-    @NotNull
-    @Valid
-    private Path spatialCoverageCountryTermsPath;
-
-    @NotNull
-    @Valid
-    private ExecutorServiceFactory taskQueue;
+    @Email
+    private String email;
+    // Can be null
+    private String affiliation;
 }

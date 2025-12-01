@@ -28,4 +28,7 @@ public class DVCore {
     public static final Property restricted = m.createProperty(NS, "restricted");
     public static final Property checksum = m.createProperty(NS, "checksum");
     public static final Property directoryLabel = m.createProperty(NS, "directoryLabel");
+    public static final Property embargoed = m.createProperty(NS, "embargoed");
+    public static final Property dateAvailable = m.createProperty(NS, "dateAvailable");
+    public static final Property reason = m.createProperty(NS, "reason");
 }

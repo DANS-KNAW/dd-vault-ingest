@@ -20,6 +20,7 @@ import nl.knaw.dans.bagit.domain.Bag;
 import nl.knaw.dans.bagit.reader.BagReader;
 import nl.knaw.dans.bagit.verify.BagVerifier;
 import nl.knaw.dans.vaultingest.AbstractTestWithTestDir;
+import nl.knaw.dans.vaultingest.config.ContactPersonConfig;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteConverter;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteSerializer;
 import nl.knaw.dans.vaultingest.core.deposit.DepositManager;
@@ -50,8 +51,14 @@ class BagPackWriterTest extends AbstractTestWithTestDir {
         assertThat(isBagValid(deposit.getBagDir())).isTrue(); // Valid before enriching
         var bagPack = testDir.resolve("rda-bag.zip");
 
+        var contactPersonConfig = new ContactPersonConfig();
+        contactPersonConfig.setName("Test Contact");
+        contactPersonConfig.setEmail("test@example.com");
+        contactPersonConfig.setAffiliation("Test Affiliation");
+
         var bagPackWriter = new BagPackWriter(
             deposit,
+            contactPersonConfig,
             new DataciteSerializer(),
             new PidMappingSerializer(),
             new OaiOreSerializer(new ObjectMapper()),

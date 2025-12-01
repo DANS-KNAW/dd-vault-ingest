@@ -24,16 +24,18 @@ import org.apache.jena.vocabulary.SchemaDO;
 import org.w3c.dom.Node;
 
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 public class DataFile extends Base {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public static List<Statement> toRDF(Resource resource, PayloadFile payloadFile) {
+    public static List<Statement> toRDF(Resource resource, PayloadFile payloadFile, LocalDate embargoDate) {
         var result = new ArrayList<Statement>();
 
         // FIL001A
@@ -55,6 +57,13 @@ public class DataFile extends Base {
         // FIL005, FIL006
         toBasicTerm(resource, DVCore.restricted, getRestricted(payloadFile.getFilesXmlNode(), payloadFile.getDdmNode()))
             .ifPresent(result::add);
+
+        result.addAll(toComplexTerms(resource, DVCore.embargoed, embargoDate != null ? List.of(embargoDate) : Collections.emptyList(), (element, value) -> {
+            if (value != null) {
+                element.addProperty(DVCore.dateAvailable, formatter.format(value));
+                element.addProperty(DVCore.reason, "");
+            }
+        }));
 
         return result;
     }

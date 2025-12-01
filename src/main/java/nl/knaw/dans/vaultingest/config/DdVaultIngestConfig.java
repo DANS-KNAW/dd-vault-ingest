@@ -19,14 +19,13 @@ package nl.knaw.dans.vaultingest.config;
 import io.dropwizard.core.Configuration;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DdVaultIngestFlowConfig extends Configuration {
+public class DdVaultIngestConfig extends Configuration {
     @NotNull
     @Valid
     private ValidateDansBagConfig validateDansBag;

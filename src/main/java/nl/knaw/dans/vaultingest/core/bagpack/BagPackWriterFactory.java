@@ -16,6 +16,7 @@
 package nl.knaw.dans.vaultingest.core.bagpack;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.knaw.dans.vaultingest.config.ContactPersonConfig;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteConverter;
 import nl.knaw.dans.vaultingest.core.datacite.DataciteSerializer;
 import nl.knaw.dans.vaultingest.core.deposit.CountryResolver;
@@ -27,6 +28,7 @@ import nl.knaw.dans.vaultingest.core.pidmapping.PidMappingConverter;
 import nl.knaw.dans.vaultingest.core.pidmapping.PidMappingSerializer;
 
 public class BagPackWriterFactory {
+    private final ContactPersonConfig contactPersonConfig;
 
     private final DataciteSerializer dataciteSerializer;
     private final PidMappingSerializer pidMappingSerializer;
@@ -36,7 +38,8 @@ public class BagPackWriterFactory {
     private final PidMappingConverter pidMappingConverter;
     private final OaiOreConverter oaiOreConverter;
 
-    public BagPackWriterFactory(ObjectMapper objectMapper, LanguageResolver languageResolver, CountryResolver countryResolver) {
+    public BagPackWriterFactory(ContactPersonConfig contactPersonConfig, ObjectMapper objectMapper, LanguageResolver languageResolver, CountryResolver countryResolver) {
+        this.contactPersonConfig = contactPersonConfig;
         this.dataciteSerializer = new DataciteSerializer();
         this.pidMappingSerializer = new PidMappingSerializer();
         this.oaiOreSerializer = new OaiOreSerializer(objectMapper);
@@ -48,6 +51,7 @@ public class BagPackWriterFactory {
     public BagPackWriter createBagPackWriter(Deposit deposit) {
         return new BagPackWriter(
             deposit,
+            contactPersonConfig,
             dataciteSerializer,
             pidMappingSerializer,
             oaiOreSerializer,

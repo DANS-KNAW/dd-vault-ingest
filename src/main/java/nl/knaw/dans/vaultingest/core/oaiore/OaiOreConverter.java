@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.vaultingest.core.oaiore;
 
+import nl.knaw.dans.vaultingest.config.ContactPersonConfig;
 import nl.knaw.dans.vaultingest.core.deposit.CountryResolver;
 import nl.knaw.dans.vaultingest.core.deposit.Deposit;
 import nl.knaw.dans.vaultingest.core.deposit.LanguageResolver;
@@ -22,12 +23,13 @@ import nl.knaw.dans.vaultingest.core.deposit.PayloadFile;
 import nl.knaw.dans.vaultingest.core.mappings.AlternativeTitles;
 import nl.knaw.dans.vaultingest.core.mappings.Audiences;
 import nl.knaw.dans.vaultingest.core.mappings.Authors;
+import nl.knaw.dans.vaultingest.core.mappings.Available;
 import nl.knaw.dans.vaultingest.core.mappings.CollectionDates;
+import nl.knaw.dans.vaultingest.core.mappings.ContactPerson;
 import nl.knaw.dans.vaultingest.core.mappings.Contributors;
 import nl.knaw.dans.vaultingest.core.mappings.DansRelations;
 import nl.knaw.dans.vaultingest.core.mappings.DataFile;
 import nl.knaw.dans.vaultingest.core.mappings.Descriptions;
-import nl.knaw.dans.vaultingest.core.mappings.DistributionDate;
 import nl.knaw.dans.vaultingest.core.mappings.Distributors;
 import nl.knaw.dans.vaultingest.core.mappings.GrantNumbers;
 import nl.knaw.dans.vaultingest.core.mappings.InCollection;
@@ -56,6 +58,7 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.SchemaDO;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 public class OaiOreConverter {
@@ -68,11 +71,11 @@ public class OaiOreConverter {
         this.countryResolver = countryResolver;
     }
 
-    public Model convert(Deposit deposit) {
+    public Model convert(Deposit deposit, ContactPersonConfig contactPerson) {
         var model = ModelFactory.createDefaultModel();
 
         var resourceMap = createResourceMap(deposit, model);
-        var resource = createAggregation(deposit, model);
+        var resource = createAggregation(deposit, model, Available.getEmbargoDate(deposit.getDdm()));
 
         model.add(Titles.toRDF(resource, deposit));
         AlternativeTitles.toRDF(resource, deposit)
@@ -80,6 +83,8 @@ public class OaiOreConverter {
 
         model.add(OtherIds.toRDF(resource, deposit));
         model.add(Authors.toRDF(resource, deposit));
+
+        model.add(ContactPerson.toRDF(resource, contactPerson));
 
         model.add(Descriptions.toRDF(resource, deposit));
         model.add(Subjects.toRDF(resource, deposit));
@@ -94,8 +99,7 @@ public class OaiOreConverter {
         model.add(GrantNumbers.toRDF(resource, deposit));
         model.add(Distributors.toRDF(resource, deposit));
 
-        DistributionDate.toRDF(resource, deposit)
-            .ifPresent(model::add);
+        model.add(Available.toRDF(resource, deposit));
 
         model.add(CollectionDates.toRDF(resource, deposit));
         model.add(Sources.toRDF(resource, deposit));
@@ -153,17 +157,16 @@ public class OaiOreConverter {
         return resourceMap;
     }
 
-    Resource createAggregatedResource(Model model, PayloadFile payloadFile) {
+    Resource createAggregatedResource(Model model, PayloadFile payloadFile, LocalDate embargoDate) {
         var resource = model.createResource("urn:uuid:" + payloadFile.getId());
 
         model.add(model.createStatement(resource, RDF.type, ORE.AggregatedResource));
         model.add(model.createStatement(resource, SchemaDO.name, payloadFile.getPath().toString()));
-        model.add(DataFile.toRDF(resource, payloadFile));
-
+        model.add(DataFile.toRDF(resource, payloadFile, embargoDate));
         return resource;
     }
 
-    Resource createAggregation(Deposit deposit, Model model) {
+    Resource createAggregation(Deposit deposit, Model model, LocalDate embargoDate) {
         var resource = model.createResource(deposit.getNbn());
         var type = model.createStatement(resource, RDF.type, ORE.Aggregation);
 
@@ -171,7 +174,7 @@ public class OaiOreConverter {
 
         if (deposit.getPayloadFiles() != null) {
             for (var file : deposit.getPayloadFiles()) {
-                var fileResource = createAggregatedResource(model, file);
+                var fileResource = createAggregatedResource(model, file, embargoDate);
 
                 model.add(model.createStatement(
                     resource,
