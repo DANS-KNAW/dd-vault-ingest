@@ -35,7 +35,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.SchemaDO;
@@ -44,7 +43,6 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,7 +54,7 @@ public class OaiOreConverterIntegrationTest {
     void title() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DCTerms.title, (RDFNode) null)
+            obj.resource, DCTerms.title, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -70,7 +68,7 @@ public class OaiOreConverterIntegrationTest {
     void alternativeTitles() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DCTerms.alternative, (RDFNode) null)
+            obj.resource, DCTerms.alternative, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -84,7 +82,7 @@ public class OaiOreConverterIntegrationTest {
     void otherIds() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DVCitation.otherId, (RDFNode) null)
+           obj.resource, DVCitation.otherId, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -104,7 +102,7 @@ public class OaiOreConverterIntegrationTest {
     void authors() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DVCitation.author, (RDFNode) null)
+            obj.resource, DVCitation.author, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -129,7 +127,7 @@ public class OaiOreConverterIntegrationTest {
     void descriptions() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DVCitation.dsDescription, (RDFNode) null)
+            obj.resource, DVCitation.dsDescription, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -158,7 +156,7 @@ public class OaiOreConverterIntegrationTest {
     void subjects() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DCTerms.subject, (RDFNode) null)
+            obj.resource, DCTerms.subject, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -173,7 +171,7 @@ public class OaiOreConverterIntegrationTest {
     void keywords() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DVCitation.keyword, (RDFNode) null)
+            obj.resource, DVCitation.keyword, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -198,7 +196,7 @@ public class OaiOreConverterIntegrationTest {
     void publications() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DCTerms.isReferencedBy, (RDFNode) null)
+            obj.resource, DCTerms.isReferencedBy, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -215,7 +213,7 @@ public class OaiOreConverterIntegrationTest {
     void languages() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DCTerms.language, (RDFNode) null)
+            obj.resource, DCTerms.language, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -229,7 +227,7 @@ public class OaiOreConverterIntegrationTest {
     void productionDates() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DVCitation.productionDate, (RDFNode) null)
+            obj.resource, DVCitation.productionDate, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -243,7 +241,7 @@ public class OaiOreConverterIntegrationTest {
     void contributors() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DCTerms.contributor, (RDFNode) null)
+            obj.resource, DCTerms.contributor, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -260,7 +258,7 @@ public class OaiOreConverterIntegrationTest {
     void grantNumbers() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, SchemaDO.sponsor, (RDFNode) null)
+            obj.resource, SchemaDO.sponsor, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -277,7 +275,7 @@ public class OaiOreConverterIntegrationTest {
     void distributor() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DVCitation.distributor, (RDFNode) null)
+            obj.resource, DVCitation.distributor, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -290,7 +288,7 @@ public class OaiOreConverterIntegrationTest {
     void distributionDate() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DVCitation.distributionDate, (RDFNode) null)
+            obj.resource, DVCitation.distributionDate, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -304,7 +302,7 @@ public class OaiOreConverterIntegrationTest {
     void dateOfCollection() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DVCitation.dateOfCollection, (RDFNode) null)
+            obj.resource, DVCitation.dateOfCollection, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -321,7 +319,7 @@ public class OaiOreConverterIntegrationTest {
     void wasDerivedFrom() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, PROV.wasDerivedFrom, (RDFNode) null)
+            obj.resource, PROV.wasDerivedFrom, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -335,7 +333,7 @@ public class OaiOreConverterIntegrationTest {
     //    void doi() throws Exception {
     //        var obj = loadModel();
     //        var statements = obj.model.listStatements(
-    //            new SimpleSelector(obj.resource, PROV.alternateOf, (RDFNode) null)
+    //            obj.resource, PROV.alternateOf, (RDFNode) null
     //        ).toList();
     //
     //        assertThat(statements)
@@ -349,7 +347,7 @@ public class OaiOreConverterIntegrationTest {
     void available() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DCTerms.available, (RDFNode) null)
+            obj.resource, DCTerms.available, (RDFNode) null
         ).toList();
 
         // because date is in the past
@@ -364,7 +362,7 @@ public class OaiOreConverterIntegrationTest {
     void dansRightHolder() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DansRights.dansRightsHolder, (RDFNode) null)
+            obj.resource, DansRights.dansRightsHolder, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -378,7 +376,7 @@ public class OaiOreConverterIntegrationTest {
     void dansPersonalDataPresent() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DansRights.dansPersonalDataPresent, (RDFNode) null)
+            obj.resource, DansRights.dansPersonalDataPresent, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -392,7 +390,7 @@ public class OaiOreConverterIntegrationTest {
     void dansMetadataLanguage() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DansRights.dansMetadataLanguage, (RDFNode) null)
+            obj.resource, DansRights.dansMetadataLanguage, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -406,7 +404,7 @@ public class OaiOreConverterIntegrationTest {
     void dansAudience() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DansRel.dansAudience, (RDFNode) null)
+            obj.resource, DansRel.dansAudience, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -420,7 +418,7 @@ public class OaiOreConverterIntegrationTest {
     void dansCollection() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DansRel.dansCollection, (RDFNode) null)
+            obj.resource, DansRel.dansCollection, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -434,7 +432,7 @@ public class OaiOreConverterIntegrationTest {
     void dansRelation() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DansRel.dansRelation, (RDFNode) null)
+            obj.resource, DansRel.dansRelation, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -500,7 +498,7 @@ public class OaiOreConverterIntegrationTest {
     void temporalCoverage() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DansTS.dansTemporalCoverage, (RDFNode) null)
+            obj.resource, DansTS.dansTemporalCoverage, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -514,7 +512,7 @@ public class OaiOreConverterIntegrationTest {
     void spatialCoverageControlled() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DansTS.dansSpatialCoverageControlled, (RDFNode) null)
+            obj.resource, DansTS.dansSpatialCoverageControlled, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -528,7 +526,7 @@ public class OaiOreConverterIntegrationTest {
     void spatialCoverageText() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DansTS.dansSpatialCoverageText, (RDFNode) null)
+            obj.resource, DansTS.dansSpatialCoverageText, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -542,7 +540,7 @@ public class OaiOreConverterIntegrationTest {
     void dansBagId() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DansDVMetadata.dansBagId, (RDFNode) null)
+            obj.resource, DansDVMetadata.dansBagId, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -556,7 +554,7 @@ public class OaiOreConverterIntegrationTest {
     void dansNbn() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DansDVMetadata.dansNbn, (RDFNode) null)
+            obj.resource, DansDVMetadata.dansNbn, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -570,7 +568,7 @@ public class OaiOreConverterIntegrationTest {
     void dansOtherId() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DansDVMetadata.dansOtherId, (RDFNode) null)
+            obj.resource, DansDVMetadata.dansOtherId, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -584,7 +582,7 @@ public class OaiOreConverterIntegrationTest {
     void dansSwordToken() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DansDVMetadata.dansSwordToken, (RDFNode) null)
+            obj.resource, DansDVMetadata.dansSwordToken, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -598,7 +596,7 @@ public class OaiOreConverterIntegrationTest {
     void license() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, SchemaDO.license, (RDFNode) null)
+            obj.resource, SchemaDO.license, (RDFNode) null
         ).toList();
 
         assertThat(statements)
@@ -612,7 +610,7 @@ public class OaiOreConverterIntegrationTest {
     void fileTermsOfAccess() throws Exception {
         var obj = loadModel();
         var statements = obj.model.listStatements(
-            new SimpleSelector(obj.resource, DVCore.fileTermsOfAccess, (RDFNode) null)
+            obj.resource, DVCore.fileTermsOfAccess, (RDFNode) null
         ).toList();
 
         assertThat(statements)

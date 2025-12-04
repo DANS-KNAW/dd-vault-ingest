@@ -22,7 +22,7 @@
     <parent>
         <groupId>nl.knaw.dans</groupId>
         <artifactId>dd-parent</artifactId>
-        <version>1.9.0</version>
+        <version>1.10.0</version>
     </parent>
     <artifactId>dd-vault-ingest</artifactId>
     <version>1.8.1-SNAPSHOT</version>
@@ -34,10 +34,6 @@
 
     <properties>
         <main-class>nl.knaw.dans.vaultingest.DdVaultIngestApplication</main-class>
-        <dd-validate-dans-bag-api.version>1.0.0</dd-validate-dans-bag-api.version>
-        <!-- TODO: move to parent pom -->
-        <dd-vault-catalog-api.version>0.9.0</dd-vault-catalog-api.version>
-        <dans-java-utils.version>2.0.0</dans-java-utils.version>
     </properties>
 
     <scm>
@@ -66,13 +62,11 @@
         <dependency>
             <groupId>nl.knaw.dans</groupId>
             <artifactId>dans-validation-lib</artifactId>
-            <version>1.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.19.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -115,6 +109,7 @@
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
+            <version>4.10.0</version>
             <type>pom</type>
         </dependency>
 
@@ -126,7 +121,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-configuration2</artifactId>
-            <version>2.10.1</version>
         </dependency>
 
         <dependency>
@@ -137,7 +131,6 @@
         <dependency>
             <groupId>nl.knaw.dans</groupId>
             <artifactId>dans-bagit-lib</artifactId>
-            <version>1.2.0</version>
         </dependency>
 
         <dependency>
@@ -154,7 +147,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
-            <version>5.1.1</version>
             <scope>test</scope>
         </dependency>
 
@@ -172,7 +164,6 @@
         <dependency>
             <groupId>com.github.marschall</groupId>
             <artifactId>memoryfilesystem</artifactId>
-            <version>2.6.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
