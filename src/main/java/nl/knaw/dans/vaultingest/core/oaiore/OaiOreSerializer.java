@@ -15,9 +15,14 @@
  */
 package nl.knaw.dans.vaultingest.core.oaiore;
 
+import com.apicatalog.jsonld.JsonLd;
+import com.apicatalog.jsonld.JsonLdOptions;
+import com.apicatalog.jsonld.document.JsonDocument;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jsonldjava.core.JsonLdOptions;
+import jakarta.json.Json;
+import jakarta.json.JsonReader;
+import jakarta.json.JsonStructure;
 import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.vaultingest.core.mappings.vocabulary.DVCitation;
 import nl.knaw.dans.vaultingest.core.mappings.vocabulary.DVCore;
@@ -29,21 +34,19 @@ import nl.knaw.dans.vaultingest.core.mappings.vocabulary.DansTS;
 import nl.knaw.dans.vaultingest.core.mappings.vocabulary.Datacite;
 import nl.knaw.dans.vaultingest.core.mappings.vocabulary.ORE;
 import nl.knaw.dans.vaultingest.core.mappings.vocabulary.PROV;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.riot.JsonLDWriteContext;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.riot.SysRIOT;
-
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.DC_11;
 import org.apache.jena.vocabulary.SchemaDO;
 
 import java.io.ByteArrayOutputStream;
-
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -84,11 +87,8 @@ public class OaiOreSerializer {
 
     public String serializeAsJsonLd(Model model) {
         /*
-         * Framing is a way to control the layout of the resulting JSON-LD document. We want to get a similar result as Dataverse. By default, Jena will produce a document with the key "@graph", which
-         * contains an array of resources. The document we are producing describes a resource map, which is a single resource. The aggregation it describes (i.e., the dataset) can be embedded in the
-         * resource map, as in their turn, can the files that are aggregated by the dataset.
-         *
-         * Please note that the code contains several pieces that must not be changed, or Jena will revert to using "@graph", sometimes seven an empty "@graph".
+         * Framing got a bit more involved in Jena 5. We first have to create a JSON-LD, read it as a JSON structure, create a frame as a JSON structure,
+         * and then apply the frame using the JSON-LD Java library.
          */
 
         // The type must be set to "ResourceMap" so that the resource-map in the model will be used as the root resource.
@@ -100,19 +100,40 @@ public class OaiOreSerializer {
             }
             """, namespacesAsJsonObject(getUsedNamespaces(model)));
 
-        JsonLdOptions opts = new JsonLdOptions();
-        opts.setOmitGraph(true); // To suppress inserting the "@graph" key. Otherwise, Jena will insert it, even though it is not necessary.
-        opts.setPruneBlankNodeIdentifiers(true); // To suppress generating IDs for nodes that do not have an explicit identifier.
-
-        var ctx = new JsonLDWriteContext(); // We use JSON-LD 1.0. TODO: How to achieve the same result with JSON-LD 1.1?
-        ctx.setFrame(frame); // Use the frame defined above.
-        ctx.setOptions(opts);
-
-        return RDFWriter.create()
-            .source(model) // Do not wrap the model in a graph
-            .format(RDFFormat.JSONLD10_FRAME_PRETTY) // Use JSON-LD 1.0. It is essential to use this format, otherwise the frame will not be applied.
-            .context(ctx)
+        String jsonLd = RDFWriter.create()
+            .source(model)
+            .format(RDFFormat.JSONLD11_PRETTY)
             .asString();
+
+        JsonStructure inputJson;
+        try (JsonReader r = Json.createReader(new StringReader(jsonLd))) {
+            inputJson = r.read();
+        }
+
+        JsonStructure frameJson;
+        try (JsonReader r = Json.createReader(new StringReader(frame))) {
+            frameJson = r.read();
+        }
+
+        JsonDocument inputDoc = JsonDocument.of(inputJson);
+        JsonDocument frameDoc = JsonDocument.of(frameJson);
+
+        JsonLdOptions options = new JsonLdOptions();
+        options.setOmitGraph(true);
+
+        try {
+            JsonStructure framed = JsonLd.frame(inputDoc, frameDoc)
+                .options(options).get();
+
+            StringWriter out = new StringWriter();
+            Json.createWriter(out).write(framed);
+
+            return out.toString();
+        }
+        catch (Exception e) {
+            log.error("Error framing JSON-LD", e);
+            throw new RuntimeException(e);
+        }
     }
 
     private String namespacesAsJsonObject(Map<String, String> namespaces) {
