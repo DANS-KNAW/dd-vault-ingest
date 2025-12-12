@@ -91,6 +91,8 @@ public class OaiOreSerializer {
          * and then apply the frame using the JSON-LD Java library.
          */
 
+        // The type must be set to "ResourceMap" so that the resource-map in the model will be used as the root resource.
+        // The context must be created as a string; setNamespacePrefixes has no effect.
         var frame = String.format("""
             {
               "@context": %s,
