@@ -189,7 +189,7 @@ public class DepositManager {
                 var checksums = manifests.get(bagDir.relativize(physicalPath));
 
                 return PayloadFile.builder()
-                    .id(UUID.randomUUID().toString())
+                    .id("urn:uuid:" + UUID.randomUUID())
                     .physicalPath(physicalPath)
                     .filesXmlNode(node)
                     .ddmNode(ddm)

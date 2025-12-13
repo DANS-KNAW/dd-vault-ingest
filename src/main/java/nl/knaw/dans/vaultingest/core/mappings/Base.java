@@ -94,6 +94,20 @@ public class Base {
         ));
     }
 
+    static Optional<Statement> toBasicTerm(Resource resource, Property property, Boolean value) {
+        if (value == null) {
+            return Optional.empty();
+        }
+
+        var model = resource.getModel();
+
+        return Optional.of(model.createStatement(
+            resource,
+            property,
+            model.createTypedLiteral(value)
+        ));
+    }
+
     static <T> List<Statement> toComplexTerms(Resource resource, Property property, Collection<T> values, TermMapper<T> mapper) {
         if (values == null) {
             return List.of();

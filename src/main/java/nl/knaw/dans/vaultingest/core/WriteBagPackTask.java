@@ -200,7 +200,7 @@ public class WriteBagPackTask implements Runnable {
         // strip anything before all colons (if present), and also the colon itself
         bagId = bagId.toLowerCase().replaceAll(".*:", "");
 
-        return String.format("vaas-%s-v%s.zip", bagId, objectVersion);
+        return String.format("vaas-%s_v%s.zip", bagId, objectVersion);
     }
 
     private Path getBagDir(Path path) throws InvalidDepositException {

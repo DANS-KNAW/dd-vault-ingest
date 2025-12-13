@@ -131,7 +131,7 @@ public class OaiOreConverter {
     }
 
     Resource createResourceMap(Deposit deposit, Model model) {
-        var resourceMap = model.createResource("urn:uuid:" + deposit.getId());
+        var resourceMap = model.createResource("urn:uuid" + deposit.getId());
         var resourceMapType = model.createStatement(resourceMap, RDF.type, ORE.ResourceMap);
 
         model.add(resourceMapType);
@@ -158,7 +158,7 @@ public class OaiOreConverter {
     }
 
     Resource createAggregatedResource(Model model, PayloadFile payloadFile, LocalDate embargoDate) {
-        var resource = model.createResource("urn:uuid:" + payloadFile.getId());
+        var resource = model.createResource(payloadFile.getId());
 
         model.add(model.createStatement(resource, RDF.type, ORE.AggregatedResource));
         model.add(model.createStatement(resource, SchemaDO.name, payloadFile.getPath().toString()));

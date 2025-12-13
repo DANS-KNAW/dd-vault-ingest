@@ -55,7 +55,7 @@ public class DataFile extends Base {
             .ifPresent(result::add);
 
         // FIL005, FIL006
-        toBasicTerm(resource, DVCore.restricted, getRestricted(payloadFile.getFilesXmlNode(), payloadFile.getDdmNode()))
+        toBasicTerm(resource, DVCore.restricted, isRestricted(payloadFile.getFilesXmlNode(), payloadFile.getDdmNode()))
             .ifPresent(result::add);
 
         result.addAll(toComplexTerms(resource, DVCore.embargoed, embargoDate != null ? List.of(embargoDate) : Collections.emptyList(), (element, value) -> {

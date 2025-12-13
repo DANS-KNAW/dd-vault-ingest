@@ -31,7 +31,7 @@ public class PidMappingConverter {
         }
 
         for (var file : deposit.getPayloadFiles()) {
-            mappings.addMapping("file:///" + file.getId(), BagItFilePathEncoding.encodeFilePath(file.getPath()));
+            mappings.addMapping(file.getId(), BagItFilePathEncoding.encodeFilePath(file.getPath()));
         }
 
         return mappings;

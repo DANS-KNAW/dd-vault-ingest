@@ -157,11 +157,11 @@ public class OaiOreSerializer {
         namespaces.put("schema", SchemaDO.NS);
         namespaces.put("dvcore", DVCore.NS);
         namespaces.put("provo", PROV.NS);
-        namespaces.put("dansREL", DansRel.NS);
-        namespaces.put("dansRIG", DansRights.NS);
-        namespaces.put("dansTS", DansTS.NS);
-        namespaces.put("dansAR", DansArchaeology.NS);
-        namespaces.put("dansVLT", DansDVMetadata.NS);
+        namespaces.put("dansRelationMetadata", DansRel.NS);
+        namespaces.put("dansRights", DansRights.NS);
+        namespaces.put("dansTemporalSpatial", DansTS.NS);
+        namespaces.put("dansArchaeologyMetadata", DansArchaeology.NS);
+        namespaces.put("dansDataVaultMetadata", DansDVMetadata.NS);
 
         return namespaces;
     }
