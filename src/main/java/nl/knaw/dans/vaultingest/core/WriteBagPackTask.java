@@ -183,7 +183,7 @@ public class WriteBagPackTask implements Runnable {
         return numbers.size() + 1;
     }
 
-    private void convertToBagPack() throws IOException {
+    private void convertToBagPack() {
         try {
             rdaBagWriterFactory.createBagPackWriter(deposit).writeTo(dveOutbox.resolve(outputFilename(deposit.getBagId(), deposit.getObjectVersion())));
             deposit.setState(Deposit.State.ACCEPTED, "Deposit accepted");
@@ -193,14 +193,11 @@ public class WriteBagPackTask implements Runnable {
         }
     }
 
-    private String outputFilename(String bagId, Integer objectVersion) {
-        Objects.requireNonNull(bagId);
-        Objects.requireNonNull(objectVersion);
-
+    private String outputFilename(@NonNull String bagId, @NonNull Integer objectVersion) {
         // strip anything before all colons (if present), and also the colon itself
         bagId = bagId.toLowerCase().replaceAll(".*:", "");
-
-        return String.format("vaas-%s_v%s.zip", bagId, objectVersion);
+        long creationTime = System.currentTimeMillis();
+        return String.format("vaas-%s_%d_v%s.zip", bagId, creationTime, objectVersion);
     }
 
     private Path getBagDir(Path path) throws InvalidDepositException {
