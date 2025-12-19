@@ -22,7 +22,7 @@
     <parent>
         <groupId>nl.knaw.dans</groupId>
         <artifactId>dd-parent</artifactId>
-        <version>1.10.0</version>
+        <version>1.11.0</version>
     </parent>
     <artifactId>dd-vault-ingest</artifactId>
     <version>2.0.1-SNAPSHOT</version>
