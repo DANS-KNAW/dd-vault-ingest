@@ -131,7 +131,7 @@ public class OaiOreConverter {
     }
 
     Resource createResourceMap(Deposit deposit, Model model) {
-        var resourceMap = model.createResource("urn:uuid" + deposit.getId());
+        var resourceMap = model.createResource("urn:uuid:" + deposit.getId());
         var resourceMapType = model.createStatement(resourceMap, RDF.type, ORE.ResourceMap);
 
         model.add(resourceMapType);
