@@ -26,7 +26,7 @@ public interface VaultCatalogClient {
 
     DatasetDto createDatasetFor(String storageroot, Deposit deposit) throws IOException;
 
-    VersionExportDto addDatasetVersionFor(Deposit deposit) throws IOException;
+    VersionExportDto addSkeletonDatasetVersion(Deposit deposit) throws IOException;
 
     Optional<DatasetDto> findDataset(String swordToken) throws IOException;
 }

@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -133,7 +132,7 @@ public class WriteBagPackTask implements Runnable {
             checkCreatedTimestamp(dataset);
             deposit.setNbn(dataset.getNbn());
             deposit.setObjectVersion(getNextOcflVersionNumber(dataset));
-            vaultCatalogClient.addDatasetVersionFor(deposit);
+            vaultCatalogClient.addSkeletonDatasetVersion(deposit);
         }
         else {
             deposit.setNbn(idMinter.mintUrnNbn());
