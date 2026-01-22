@@ -46,15 +46,6 @@ vaultIngest:
     iso6391: /etc/opt/dans.knaw.nl/dd-vault-ingest/iso639-1-to-dv.csv
     iso6392: /etc/opt/dans.knaw.nl/dd-vault-ingest/iso639-2-to-dv.csv
   spatialCoverageCountryTermsPath: /etc/opt/dans.knaw.nl/dd-vault-ingest/spatial-coverage-country-terms.txt
-  taskQueue:
-    nameFormat: "vault-ingest-worker-%d"
-    maxQueueSize: 5000
-    # Number of threads will be increased when maxQueueSize is exceeded.
-    minThreads: 2
-    # No more than maxThreads will be created though
-    maxThreads: 5
-    # Threads will die after 60 seconds of idleness
-    keepAliveTime: 60 seconds
 
 vaultCatalog:
   url: https://dev.transfer.dans-data.nl

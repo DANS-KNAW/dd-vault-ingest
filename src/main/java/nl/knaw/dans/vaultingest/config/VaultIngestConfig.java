@@ -53,8 +53,4 @@ public class VaultIngestConfig {
     @NotNull
     @Valid
     private Path spatialCoverageCountryTermsPath;
-
-    @NotNull
-    @Valid
-    private ExecutorServiceFactory taskQueue;
 }

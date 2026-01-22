@@ -111,7 +111,7 @@ public class DdVaultIngestApplication extends Application<DdVaultIngestConfig> {
             .interval(Math.toIntExact(configuration.getVaultIngest().getInbox().getPollingInterval().toMilliseconds()))
             .inboxItemComparator(new PropertiesBasedDirectoryComparator<>("deposit.properties", "creation.timestamp", Instant::parse))
             .taskFactory(writeBagPackTaskFactory)
-            .executorService(configuration.getVaultIngest().getTaskQueue().build(environment))
+            .executorService(environment.lifecycle().executorService("vault-ingest-worker-%d").minThreads(1).maxThreads(1).build())
             .build());
 
         environment.healthChecks().register(
