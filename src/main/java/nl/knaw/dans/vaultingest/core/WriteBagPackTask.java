@@ -193,7 +193,7 @@ public class WriteBagPackTask implements Runnable {
     }
 
     private String outputFilename(@NonNull String bagId, @NonNull Integer objectVersion) {
-        // strip anything before all colons (if present), and also the colon itself
+        // strip anything before all colons (if present), and also the colon itself (i.e.,s remove "sword:" or "urn:uuid:" if present)
         bagId = bagId.toLowerCase().replaceAll(".*:", "");
         long creationTime = System.currentTimeMillis();
         return String.format("vaas-%s_%d_v%s.zip", bagId, creationTime, objectVersion);
