@@ -112,6 +112,7 @@ public class BagPackWriter {
         log.debug("[{}] Zipping directory {} to {}", deposit.getId(), deposit.getBagDir(), tempZipFile);
         ZipUtil.zipDirectory(deposit.getBagDir(), tempZipFile, true);
         log.debug("[{}] Moving {} to {}", deposit.getId(), tempZipFile, bagPack);
+        Files.deleteIfExists(bagPack);
         Files.move(tempZipFile, bagPack);
     }
 

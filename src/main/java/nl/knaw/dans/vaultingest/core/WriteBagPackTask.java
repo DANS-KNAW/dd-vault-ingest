@@ -27,6 +27,7 @@ import nl.knaw.dans.vaultingest.core.deposit.Deposit;
 import nl.knaw.dans.vaultingest.core.deposit.DepositManager;
 import nl.knaw.dans.vaultingest.core.bagpack.BagPackWriterFactory;
 import nl.knaw.dans.vaultingest.core.util.IdMinter;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -72,24 +73,68 @@ public class WriteBagPackTask implements Runnable {
     private UUID depositId;
 
     public void run() {
+        Path originalBagDirBackup = null;
         try {
             log.info("[{}] START processing deposit", getDepositId(depositDir));
-            var bagDir = getBagDir(depositDir);
+            var originalBagDir = getBagDir(depositDir);
 
-            bagValidator.validate(getDepositId(depositDir), bagDir);
+            if (originalBagDir == null) {
+                throw new InvalidDepositException("No bag directory found in deposit");
+            }
+
+            originalBagDirBackup = depositDir.resolve("org-" + originalBagDir.getFileName());
+            if (Files.exists(originalBagDirBackup)) {
+                FileUtils.deleteDirectory(originalBagDirBackup.toFile());
+            }
+            FileUtils.copyDirectory(originalBagDir.toFile(), originalBagDirBackup.toFile());
+            log.debug("[{}] Created backup of original bag at: {}", getDepositId(depositDir), originalBagDirBackup);
+
+            bagValidator.validate(getDepositId(depositDir), originalBagDir);
 
             log.debug("[{}] Loading deposit info", getDepositId(depositDir));
             deposit = depositManager.loadDeposit(depositDir, dataSupplier);
+
             processDeposit();
+
+            if (Files.exists(originalBagDir)) {
+                FileUtils.deleteDirectory(originalBagDir.toFile());
+            }
+            Files.move(originalBagDirBackup, originalBagDir);
+            originalBagDirBackup = null;
 
             depositManager.saveDepositProperties(deposit);
             log.debug("[{}] Saved deposit properties", getDepositId(depositDir));
             depositManager.updateDepositState(depositDir, Deposit.State.ACCEPTED, "Deposit accepted");
-            Files.move(depositDir, outboxProcessed.resolve(depositDir.getFileName()));
-            log.info("[{}] Moved deposit to outbox", getDepositId(depositDir));
+            var target = outboxProcessed.resolve(depositDir.getFileName());
+            log.info("[{}] Moving original deposit {} to {}", getDepositId(depositDir), depositDir, target);
+            if (Files.exists(target)) {
+                FileUtils.deleteQuietly(target.toFile());
+            }
+            try {
+                Files.move(depositDir, target);
+            }
+            catch (IOException e) {
+                log.error("[{}] Failed to move deposit directory {} to {}. Falling back to copy and delete.", getDepositId(depositDir), depositDir, target, e);
+                FileUtils.copyDirectory(depositDir.toFile(), target.toFile());
+                FileUtils.deleteDirectory(depositDir.toFile());
+            }
+            log.info("[{}] Moved original deposit to outbox", getDepositId(depositDir));
         }
         catch (InvalidDepositException e) {
             log.warn("[{}] REJECTED deposit: {}", getDepositId(depositDir), e.getMessage());
+            if (originalBagDirBackup != null && Files.exists(originalBagDirBackup)) {
+                try {
+                    // Re-calculate or use the one from before
+                    var originalBagDir = depositDir.resolve(originalBagDirBackup.getFileName().toString().substring(4));
+                    if (Files.exists(originalBagDir)) {
+                        FileUtils.deleteDirectory(originalBagDir.toFile());
+                    }
+                    Files.move(originalBagDirBackup, originalBagDir);
+                }
+                catch (IOException ioException) {
+                    log.error("[{}] Failed to restore original bag from backup", getDepositId(depositDir), ioException);
+                }
+            }
             try {
                 depositManager.updateDepositState(depositDir, Deposit.State.REJECTED, e.getMessage());
                 Files.move(depositDir, outboxRejected.resolve(depositDir.getFileName()));
@@ -100,6 +145,19 @@ public class WriteBagPackTask implements Runnable {
         }
         catch (Exception e) {
             log.error("[{}] FAILED deposit: {}", getDepositId(depositDir), e.getMessage(), e);
+            if (originalBagDirBackup != null && Files.exists(originalBagDirBackup)) {
+                try {
+                    // Re-calculate or use the one from before
+                    var originalBagDir = depositDir.resolve(originalBagDirBackup.getFileName().toString().substring(4));
+                    if (Files.exists(originalBagDir)) {
+                        FileUtils.deleteDirectory(originalBagDir.toFile());
+                    }
+                    Files.move(originalBagDirBackup, originalBagDir);
+                }
+                catch (IOException ioException) {
+                    log.error("[{}] Failed to restore original bag from backup", getDepositId(depositDir), ioException);
+                }
+            }
             try {
                 depositManager.updateDepositState(depositDir, Deposit.State.FAILED, e.getMessage());
                 Files.move(depositDir, outboxFailed.resolve(depositDir.getFileName()));
@@ -108,8 +166,20 @@ public class WriteBagPackTask implements Runnable {
                 log.error("[{}] Failed to handle failed deposit", getDepositId(depositDir), ioException);
             }
         }
+        finally {
+            if (originalBagDirBackup != null) {
+                try {
+                    FileUtils.deleteDirectory(originalBagDirBackup.toFile());
+                    log.debug("[{}] Cleaned up backup directory: {}", getDepositId(depositDir), originalBagDirBackup);
+                }
+                catch (IOException e) {
+                    log.error("[{}] Failed to clean up backup directory: {}", getDepositId(depositDir), originalBagDirBackup, e);
+                }
+            }
+        }
         log.info("[{}] END processing deposit", getDepositId(depositDir));
     }
+
 
     private UUID getDepositId(Path path) {
         if (depositId == null) {

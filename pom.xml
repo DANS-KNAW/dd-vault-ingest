@@ -35,6 +35,7 @@
     <properties>
         <main-class>nl.knaw.dans.vaultingest.DdVaultIngestApplication</main-class>
         <dd-vault-catalog-api.version>1.0.0</dd-vault-catalog-api.version>
+        <dans-bagit-lib.version>1.2.2-SNAPSHOT</dans-bagit-lib.version>
     </properties>
 
     <scm>
