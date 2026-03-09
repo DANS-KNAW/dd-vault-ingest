@@ -19,7 +19,10 @@ import lombok.Getter;
 import nl.knaw.dans.vaultingest.core.deposit.Deposit;
 import nl.knaw.dans.vaultingest.core.deposit.DepositManager;
 import nl.knaw.dans.vaultingest.core.xml.XmlReader;
+import org.apache.commons.io.FileUtils;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class TestDepositManager extends DepositManager {
@@ -52,7 +55,31 @@ public class TestDepositManager extends DepositManager {
         var resource = getClass().getResource(path.toString());
         assert resource != null;
         var resourcePath = Path.of(resource.getPath());
-        return super.loadDeposit(resourcePath, dataSupplier);
+
+        try {
+            var tempDir = Files.createTempDirectory("test-deposit");
+            var targetPath = tempDir.resolve(path.getFileName());
+            FileUtils.copyDirectory(resourcePath.toFile(), targetPath.toFile());
+
+            // Remove any "org-*" directories that might have been copied from contaminated test resources
+            try (var list = Files.list(targetPath)) {
+                list.filter(Files::isDirectory)
+                    .filter(p -> p.getFileName().toString().startsWith("org-"))
+                    .forEach(p -> {
+                        try {
+                            FileUtils.deleteDirectory(p.toFile());
+                        }
+                        catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+            }
+
+            return super.loadDeposit(targetPath, dataSupplier);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

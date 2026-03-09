@@ -15,10 +15,10 @@
  */
 package nl.knaw.dans.vaultingest.core.datacite;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import org.datacite.schema.kernel_4.Resource;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 
 public class DataciteSerializer {

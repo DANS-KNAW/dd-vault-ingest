@@ -16,8 +16,6 @@
 package nl.knaw.dans.vaultingest.config;
 
 import lombok.Data;
-import lombok.Getter;
-import nl.knaw.dans.validation.ExistingFile;
 
 import javax.validation.constraints.NotNull;
 import java.nio.file.Path;

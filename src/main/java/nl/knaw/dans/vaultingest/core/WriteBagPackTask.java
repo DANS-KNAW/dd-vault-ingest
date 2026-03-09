@@ -23,10 +23,11 @@ import nl.knaw.dans.vaultcatalog.api.VersionExportDto;
 import nl.knaw.dans.vaultingest.client.BagValidator;
 import nl.knaw.dans.vaultingest.client.InvalidDepositException;
 import nl.knaw.dans.vaultingest.client.VaultCatalogClient;
+import nl.knaw.dans.vaultingest.core.bagpack.BagPackWriterFactory;
 import nl.knaw.dans.vaultingest.core.deposit.Deposit;
 import nl.knaw.dans.vaultingest.core.deposit.DepositManager;
-import nl.knaw.dans.vaultingest.core.bagpack.BagPackWriterFactory;
 import nl.knaw.dans.vaultingest.core.util.IdMinter;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -34,6 +35,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.UUID;
+
+import static java.util.Objects.requireNonNull;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -85,6 +88,8 @@ public class WriteBagPackTask implements Runnable {
             depositManager.saveDepositProperties(deposit);
             log.debug("[{}] Saved deposit properties", getDepositId(depositDir));
             depositManager.updateDepositState(depositDir, Deposit.State.ACCEPTED, "Deposit accepted");
+
+            restoreOriginalBag();
             Files.move(depositDir, outboxProcessed.resolve(depositDir.getFileName()));
             log.info("[{}] Moved deposit to outbox", getDepositId(depositDir));
         }
@@ -92,6 +97,9 @@ public class WriteBagPackTask implements Runnable {
             log.warn("[{}] REJECTED deposit: {}", getDepositId(depositDir), e.getMessage());
             try {
                 depositManager.updateDepositState(depositDir, Deposit.State.REJECTED, e.getMessage());
+                if (deposit != null) {
+                    restoreOriginalBag();
+                }
                 Files.move(depositDir, outboxRejected.resolve(depositDir.getFileName()));
             }
             catch (IOException ioException) {
@@ -102,6 +110,7 @@ public class WriteBagPackTask implements Runnable {
             log.error("[{}] FAILED deposit: {}", getDepositId(depositDir), e.getMessage(), e);
             try {
                 depositManager.updateDepositState(depositDir, Deposit.State.FAILED, e.getMessage());
+                restoreOriginalBag();
                 Files.move(depositDir, outboxFailed.resolve(depositDir.getFileName()));
             }
             catch (IOException ioException) {
@@ -109,6 +118,21 @@ public class WriteBagPackTask implements Runnable {
             }
         }
         log.info("[{}] END processing deposit", getDepositId(depositDir));
+    }
+
+    private void restoreOriginalBag() {
+        requireNonNull(deposit, "deposit cannot be null");
+        requireNonNull(deposit.getBagDir(), "deposit bagDir cannot be null");
+        requireNonNull(deposit.getOriginalBagDir(), "deposit originalBagDir cannot be null");
+        requireNonNull(depositDir, "depositDir cannot be null");
+
+        try {
+            FileUtils.deleteDirectory(deposit.getBagDir().toFile());
+            Files.move(deposit.getOriginalBagDir(), deposit.getBagDir());
+        }
+        catch (IOException e) {
+            log.error("[{}] Failed to restore original bag", getDepositId(depositDir), e);
+        }
     }
 
     private UUID getDepositId(Path path) {
@@ -201,12 +225,17 @@ public class WriteBagPackTask implements Runnable {
 
     private Path getBagDir(Path path) throws InvalidDepositException {
         try (var list = Files.list(path)) {
-            return list.filter(Files::isDirectory)
-                .findFirst()
-                .orElse(null);
+            var dirs = list.filter(Files::isDirectory).toList();
+            if (dirs.isEmpty()) {
+                throw new InvalidDepositException("No bag directory found in deposit path: " + path);
+            }
+            else if (dirs.size() > 1) {
+                throw new InvalidDepositException("Multiple bag directories found in deposit path: " + path);
+            }
+            return dirs.get(0);
         }
         catch (IOException e) {
-            return null;
+            throw new IllegalStateException("Error listing deposit directory: " + path, e);
         }
     }
 }

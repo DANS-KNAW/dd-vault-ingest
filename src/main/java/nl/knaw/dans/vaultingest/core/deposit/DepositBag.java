@@ -15,13 +15,13 @@
  */
 package nl.knaw.dans.vaultingest.core.deposit;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.bagit.domain.Bag;
 import nl.knaw.dans.bagit.domain.Manifest;
 import nl.knaw.dans.bagit.domain.Version;
 import nl.knaw.dans.bagit.hash.SupportedAlgorithm;
 import nl.knaw.dans.bagit.writer.ManifestWriter;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.bagit.writer.MetadataWriter;
 
 import java.io.BufferedInputStream;
@@ -94,7 +94,6 @@ public class DepositBag {
     public void putBagInfoValue(String key, String value) throws IOException {
         bag.getMetadata().add(key, value);
         MetadataWriter.writeBagMetadata(bag.getMetadata(), Version.LATEST_BAGIT_VERSION(), bag.getRootDir(), StandardCharsets.UTF_8);
-
     }
 
     public List<String> getBagInfoValues(String key) {
