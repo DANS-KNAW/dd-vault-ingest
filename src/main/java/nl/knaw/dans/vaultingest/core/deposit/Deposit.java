@@ -51,6 +51,7 @@ public class Deposit {
     private final Path path;
     private final DepositProperties properties;
     private final DepositBag bag;
+    private final Path originalBagDir;
     private final boolean migration;
     @Setter
     @Builder.Default

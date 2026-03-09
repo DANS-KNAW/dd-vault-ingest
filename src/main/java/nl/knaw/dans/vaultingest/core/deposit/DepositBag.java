@@ -94,7 +94,6 @@ public class DepositBag {
     public void putBagInfoValue(String key, String value) throws IOException {
         bag.getMetadata().add(key, value);
         MetadataWriter.writeBagMetadata(bag.getMetadata(), Version.LATEST_BAGIT_VERSION(), bag.getRootDir(), StandardCharsets.UTF_8);
-
     }
 
     public List<String> getBagInfoValues(String key) {

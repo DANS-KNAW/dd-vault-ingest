@@ -27,6 +27,7 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -52,6 +53,9 @@ public class DepositManager {
         try {
             var bagDir = getBagDir(path);
 
+            var originalBagDir = bagDir.getParent().resolve("org-" + bagDir.getFileName());
+            FileUtils.copyDirectory(bagDir.toFile(), originalBagDir.toFile());
+
             log.debug("[{}] Reading bag from path {}", depositId, bagDir);
             var bag = new BagReader().read(bagDir);
 
@@ -75,6 +79,7 @@ public class DepositManager {
                 .path(path)
                 .ddm(ddm)
                 .bag(new DepositBag(bag))
+                .originalBagDir(originalBagDir)
                 .filesXml(filesXml)
                 .payloadFiles(payloadFiles)
                 .properties(depositProperties)

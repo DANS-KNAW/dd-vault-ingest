@@ -18,7 +18,9 @@ package nl.knaw.dans.vaultingest.core.bagpack;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nl.knaw.dans.bagit.domain.Version;
 import nl.knaw.dans.bagit.hash.SupportedAlgorithm;
+import nl.knaw.dans.bagit.writer.MetadataWriter;
 import nl.knaw.dans.lib.util.ZipUtil;
 import nl.knaw.dans.vaultingest.config.ContactPersonConfig;
 import nl.knaw.dans.vaultingest.core.baginfo.BagInfoConverter;
@@ -38,6 +40,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -102,6 +105,10 @@ public class BagPackWriter {
 
         log.debug("[{}] Adding to bag-info.txt", deposit.getId());
         bagInfoConverter.convert(deposit, contactPersonConfig, deposit.getBag());
+        var bagInfoPath = deposit.getBagDir().resolve("bag-info.txt");
+        var baginfoContent = FileUtils.readFileToString(bagInfoPath.toFile(), StandardCharsets.UTF_8);
+        // A bit clumsy, but the easiest way to ensure checksum is calculated for bag-info.txt
+        checksummedWriteToOutput(bagInfoPath, baginfoContent);
 
         // must be last, because all other files must have been written
         log.debug("[{}] Modifying tagmanifest-*.txt files", deposit.getId());
@@ -112,7 +119,7 @@ public class BagPackWriter {
         log.debug("[{}] Zipping directory {} to {}", deposit.getId(), deposit.getBagDir(), tempZipFile);
         ZipUtil.zipDirectory(deposit.getBagDir(), tempZipFile, true);
         log.debug("[{}] Moving {} to {}", deposit.getId(), tempZipFile, bagPack);
-        Files.move(tempZipFile, bagPack);
+        Files.move(tempZipFile, bagPack, StandardCopyOption.REPLACE_EXISTING);
     }
 
     private void modifyTagManifests() throws IOException {
