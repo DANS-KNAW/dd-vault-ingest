@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.vaultingest.core.deposit;
 
-import nl.knaw.dans.vaultingest.core.xml.XmlReader;
+import nl.knaw.dans.vaultingest.core.testutils.TestDepositManager;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -31,27 +31,17 @@ class CommonDepositManagerIntegrationTest {
 
     @Test
     void loadDeposit() {
-        var manager = new DepositManager(new XmlReader());
+        var manager = new TestDepositManager();
 
-        var s = getClass().getResource("/input/0b9bb5ee-3187-4387-bb39-2c09536c79f7");
-        assert s != null;
-
-        var deposit = manager.loadDeposit(Path.of(s.getPath()), "Name of user");
+        var deposit = manager.loadDeposit(Path.of("/input/0b9bb5ee-3187-4387-bb39-2c09536c79f7"), "Name of user");
         assertThat(deposit.getId()).isEqualTo("0b9bb5ee-3187-4387-bb39-2c09536c79f7");
     }
 
     @Test
     void loadDeposit_should_handle_OriginalFilePaths() throws Exception {
-        var manager = new DepositManager(new XmlReader());
+        var manager = new TestDepositManager();
+        var deposit = manager.loadDeposit(Path.of("/input/0b9bb5ee-3187-4387-bb39-2c09536c79f7"), "Name of user");
 
-        var s = getClass().getResource("/input/0b9bb5ee-3187-4387-bb39-2c09536c79f7");
-        assert s != null;
-        var path = Path.of(s.getPath());
-
-        // first verify there is actually an original-filepaths.txt file
-        assertThat(Files.exists(path.resolve("audiences/original-filepaths.txt"))).isTrue();
-
-        var deposit = manager.loadDeposit(path, "Name of user");
         var files = deposit.getPayloadFiles();
 
         // check that the file paths are the original ones, not the renamed ones

@@ -16,7 +16,6 @@
 package nl.knaw.dans.vaultingest.config;
 
 import lombok.Data;
-import lombok.NonNull;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;

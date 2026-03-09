@@ -16,8 +16,6 @@
 package nl.knaw.dans.vaultingest.config;
 
 import lombok.Data;
-import lombok.Getter;
-import nl.knaw.dans.lib.util.ExecutorServiceFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

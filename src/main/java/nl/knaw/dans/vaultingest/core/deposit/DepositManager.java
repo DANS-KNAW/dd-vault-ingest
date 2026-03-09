@@ -15,11 +15,11 @@
  */
 package nl.knaw.dans.vaultingest.core.deposit;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.bagit.domain.Bag;
 import nl.knaw.dans.bagit.hash.SupportedAlgorithm;
 import nl.knaw.dans.bagit.reader.BagReader;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import nl.knaw.dans.vaultingest.core.xml.XPathEvaluator;
 import nl.knaw.dans.vaultingest.core.xml.XmlReader;
 import org.apache.commons.configuration2.FileBasedConfiguration;
@@ -54,6 +54,9 @@ public class DepositManager {
             var bagDir = getBagDir(path);
 
             var originalBagDir = bagDir.getParent().resolve("org-" + bagDir.getFileName());
+            if (Files.exists(originalBagDir)) {
+                throw new IllegalStateException("Original bag already exists: " + originalBagDir);
+            }
             FileUtils.copyDirectory(bagDir.toFile(), originalBagDir.toFile());
 
             log.debug("[{}] Reading bag from path {}", depositId, bagDir);

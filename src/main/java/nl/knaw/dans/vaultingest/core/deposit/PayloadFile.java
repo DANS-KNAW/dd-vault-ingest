@@ -15,11 +15,11 @@
  */
 package nl.knaw.dans.vaultingest.core.deposit;
 
-import nl.knaw.dans.bagit.hash.SupportedAlgorithm;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import nl.knaw.dans.bagit.hash.SupportedAlgorithm;
 import org.w3c.dom.Node;
 
 import java.io.BufferedInputStream;
