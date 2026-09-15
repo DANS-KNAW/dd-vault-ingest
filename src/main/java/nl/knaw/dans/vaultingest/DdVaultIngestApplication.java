@@ -68,10 +68,10 @@ public class DdVaultIngestApplication extends Application<DdVaultIngestConfig> {
         );
         var xmlReader = new XmlReader();
         var validateDansBagProxy = new ClientProxyBuilder<nl.knaw.dans.validatedansbag.invoker.ApiClient, nl.knaw.dans.validatedansbag.client.resources.DefaultApi>()
-            .apiClient(new nl.knaw.dans.validatedansbag.invoker.ApiClient())
+            .apiClientCtor(nl.knaw.dans.validatedansbag.invoker.ApiClient::new)
             .basePath(configuration.getValidateDansBag().getValidateUrl())
             .httpClient(configuration.getValidateDansBag().getHttpClient())
-            .defaultApiCtor(nl.knaw.dans.validatedansbag.client.resources.DefaultApi::new)
+            .proxyCtor(nl.knaw.dans.validatedansbag.client.resources.DefaultApi::new)
             .build();
         var depositValidator = new BagValidatorImpl(validateDansBagProxy);
         var depositManager = new DepositManager(xmlReader);
@@ -84,10 +84,10 @@ public class DdVaultIngestApplication extends Application<DdVaultIngestConfig> {
         );
 
         var vaultCatalogProxy = new ClientProxyBuilder<ApiClient, DefaultApi>()
-            .apiClient(new ApiClient())
+            .apiClientCtor(ApiClient::new)
             .basePath(configuration.getVaultCatalog().getUrl())
             .httpClient(configuration.getVaultCatalog().getHttpClient())
-            .defaultApiCtor(DefaultApi::new)
+            .proxyCtor(DefaultApi::new)
             .build();
         var vaultCatalogClient = new VaultCatalogClientImpl(vaultCatalogProxy);
         var idMinter = new IdMinter();

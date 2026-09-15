@@ -22,26 +22,24 @@
     <parent>
         <groupId>nl.knaw.dans</groupId>
         <artifactId>dd-parent</artifactId>
-        <version>1.12.0</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>dd-vault-ingest</artifactId>
     <version>2.2.1-SNAPSHOT</version>
 
     <name>DD Vault Ingest</name>
-    <url>https://github.com/DANS-KNAW/dd-vault-ingest</url>
     <description>Vault Ingest Service</description>
+    <url>https://github.com/DANS-KNAW/dd-vault-ingest</url>
     <inceptionYear>2023</inceptionYear>
-
-    <properties>
-        <main-class>nl.knaw.dans.vaultingest.DdVaultIngestApplication</main-class>
-        <dd-vault-catalog-api.version>1.1.0</dd-vault-catalog-api.version>
-        <dans-bagit-lib.version>1.2.2</dans-bagit-lib.version>
-    </properties>
 
     <scm>
         <developerConnection>scm:git:ssh://github.com/DANS-KNAW/${project.artifactId}</developerConnection>
         <tag>HEAD</tag>
     </scm>
+
+    <properties>
+        <main-class>nl.knaw.dans.vaultingest.DdVaultIngestApplication</main-class>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -62,7 +60,7 @@
             <artifactId>dans-java-utils</artifactId>
         </dependency>
         <dependency>
-            <groupId>nl.knaw.dans</groupId>
+            <groupId>nl.datastations</groupId>
             <artifactId>dans-validation-lib</artifactId>
         </dependency>
 
@@ -129,7 +127,7 @@
         </dependency>
 
         <dependency>
-            <groupId>nl.knaw.dans</groupId>
+            <groupId>nl.datastations</groupId>
             <artifactId>dans-bagit-lib</artifactId>
         </dependency>
 
@@ -175,10 +173,10 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>initialize</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
+                        <phase>initialize</phase>
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
@@ -268,52 +266,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>dans-releases</id>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <url>https://maven.dans.knaw.nl/releases/</url>
-        </repository>
-        <repository>
-            <id>dans-snapshots</id>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <url>https://maven.dans.knaw.nl/snapshots/</url>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>dans-releases</id>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <url>https://maven.dans.knaw.nl/releases/</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>dans-snapshots</id>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <url>https://maven.dans.knaw.nl/snapshots/</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <profiles>
         <profile>
