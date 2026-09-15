@@ -29,7 +29,7 @@
 
     <name>DD Vault Ingest</name>
     <description>Vault Ingest Service</description>
-    <url>https://github.com/DANS-KNAW/dd-vault-ingest</url>
+    <url>https://dans-knaw.github.io/dd-vault-ingest</url>
     <inceptionYear>2023</inceptionYear>
 
     <scm>
