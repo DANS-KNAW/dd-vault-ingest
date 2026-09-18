@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Description - dd-vault-ingest</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Description";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> dd-vault-ingest
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Manual</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Description</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#purpose">Purpose</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#interfaces">Interfaces</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#provided-interfaces">Provided interfaces</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#inbox">Inbox</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#admin-console">Admin console</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#consumed-interfaces">Consumed interfaces</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#vault-catalog">Vault Catalog</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#validate-dans-bag">Validate DANS Bag</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#processing">Processing</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="config/">Configuration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="context/">Context</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Development</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="dev/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="dev-debugging/">Local debugging</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">dd-vault-ingest</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Manual</li>
+      <li class="breadcrumb-item active">Description</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/DANS-KNAW/dd-vault-ingest/edit/master/docs/index.md">Edit on DANS-KNAW/dd-vault-ingest</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="dd-vault-ingest">dd-vault-ingest<a class="headerlink" href="#dd-vault-ingest" title="Permanent link">&para;</a></h1>
+<p>Service that processes DANS bag deposits converting them to RDA compliant BagPacks and sends them to the DANS Data Vault.</p>
+<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
+<p>This service is part of the <a href="https://dans-knaw.github.io/dans-datastation-architecture/vaas/" target="_blank">Vault as a Service</a> pipeline. It is responsible for:</p>
+<ul>
+<li>Validating incoming DANS deposits</li>
+<li>Converting DANS deposits to RDA compliant BagPacks</li>
+<li>Handing the BagPacks over to <a href="https://dans-knaw.github.io/dans-datastation-architecture/dans-microservices/#dd-transfer-to-vault" target="_blank">Transfer Service</a> for ingestion into the DANS Data Vault</li>
+</ul>
+<h2 id="interfaces">Interfaces<a class="headerlink" href="#interfaces" title="Permanent link">&para;</a></h2>
+<p>This service has the following interfaces:</p>
+<p><img alt="" src="img/overview.png" width="70%" /></p>
+<h3 id="provided-interfaces">Provided interfaces<a class="headerlink" href="#provided-interfaces" title="Permanent link">&para;</a></h3>
+<h4 id="inbox">Inbox<a class="headerlink" href="#inbox" title="Permanent link">&para;</a></h4>
+<ul>
+<li><em>Protocol type</em>: Shared filesystem</li>
+<li><em>Internal or external</em>: <strong>internal</strong></li>
+<li><em>Purpose</em>: to receive DANS bag deposits from the SWORDv2 deposit service</li>
+</ul>
+<h4 id="admin-console">Admin console<a class="headerlink" href="#admin-console" title="Permanent link">&para;</a></h4>
+<ul>
+<li><em>Protocol type</em>: HTTP</li>
+<li><em>Internal or external</em>: <strong>internal</strong></li>
+<li><em>Purpose</em>: application monitoring and management</li>
+</ul>
+<h3 id="consumed-interfaces">Consumed interfaces<a class="headerlink" href="#consumed-interfaces" title="Permanent link">&para;</a></h3>
+<h4 id="vault-catalog">Vault Catalog<a class="headerlink" href="#vault-catalog" title="Permanent link">&para;</a></h4>
+<ul>
+<li><em>Protocol type</em>: HTTP</li>
+<li><em>Internal or external</em>: <strong>internal</strong></li>
+<li><em>Purpose</em>: register skeleton dataset version records for incoming deposits </li>
+</ul>
+<h4 id="validate-dans-bag">Validate DANS Bag<a class="headerlink" href="#validate-dans-bag" title="Permanent link">&para;</a></h4>
+<ul>
+<li><em>Protocol type</em>: HTTP</li>
+<li><em>Internal or external</em>: <strong>internal</strong></li>
+<li><em>Purpose</em>: validate incoming DANS bag deposits</li>
+</ul>
+<h2 id="processing">Processing<a class="headerlink" href="#processing" title="Permanent link">&para;</a></h2>
+<p>The service continuously monitors its inbox for new DANS bag deposits. When a new deposit arrives, the service performs the following steps:</p>
+<ol>
+<li>Validate the DANS bag using the Validate DANS Bag service.</li>
+<li>If the bag is valid, create a skeleton dataset version record in the Vault Catalog.</li>
+<li>Convert the DANS bag to an RDA compliant BagPack.</li>
+<li>Hand over the BagPack to the Transfer Service for ingestion into the DANS Data Vault.</li>
+</ol>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="installation/" class="btn btn-neutral float-right" title="Installation">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/DANS-KNAW/dd-vault-ingest" class="fa fa-code-fork" style="color: #fcfcfc"> DANS-KNAW/dd-vault-ingest</a>
+        </span>
+    
+    
+    
+      <span><a href="installation/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = ".";</script>
+    <script src="js/theme_extra.js"></script>
+    <script src="js/theme.js"></script>
+      <script src="search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
